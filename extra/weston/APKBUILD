@@ -53,7 +53,7 @@ subpackages="
 	$pkgname-clients
 	$_libname:libs
 	"
-source="https://github.com/qnx/weston/archive/$_commit.tar.gz
+source="https://github.com/qnx-ports/weston/archive/$_commit.tar.gz
 	input.h
 	pty.h
 	qnx-fix.patch
