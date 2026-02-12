@@ -1,13 +1,13 @@
 pkgname=vim
 pkgver=9.1.0707
-pkgrel=1
+pkgrel=2
 _luaver=5.4
 pkgdesc="Improved vi-style text editor"
 url="https://www.vim.org/"
 arch="all"
 license="Vim"
 depends="ncurses qnx-io-sock"
-makedepends="ncurses-dev qnx-io-sock-dev" 
+makedepends="ncurses-dev qnx-io-sock-dev clang"
 subpackages="
     $pkgname-doc
     ${pkgname}diff:${pkgname}diff:noarch
@@ -25,7 +25,9 @@ prepare() {
 }
 
 build() {
-    export CFLAGS="$CFLAGS -flto=auto -O2"
+    export CC=clang
+    export CXX=clang++
+    export CFLAGS="$CFLAGS -O2"
     export vim_cv_toupper_broken=yes
     export vim_cv_terminfo=yes
     export vim_cv_tgetent=zero
@@ -34,6 +36,7 @@ build() {
     export vim_cv_memmove_handles_overlap=yes
     export vim_cv_uname_output="QNX"
     export ac_cv_prog_STRIP=$CTARGET-strip
+    export ac_cv_c_compiler_gnu=no
 
     ./configure \
         --build=$CBUILD \
