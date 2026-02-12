@@ -8,8 +8,6 @@ pkgdesc="Core c99 package for AWS SDK for C. Includes cross-platform primitives,
 url="https://github.com/awslabs/aws-c-common"
 arch="all"
 license="Apache-2.0"
-options="!check"
-depends="qnx-gcc-libs libcrypto3 qnx-microkernel"
 makedepends="
     cmake
     ninja
@@ -22,7 +20,6 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/awslabs/aws-c-common/archive
 
 build() {
   CC=clang \
-  CFLAGS="-D_QNX_SOURCE" \
   cmake -B build -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
@@ -40,10 +37,6 @@ check() {
 
 package() {
   DESTDIR="$pkgdir" cmake --install build
-}
-
-dev() {
-  default_dev
 }
 
 sha512sums="
