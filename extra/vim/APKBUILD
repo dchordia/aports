@@ -35,7 +35,6 @@ build() {
     export vim_cv_stat_ignores_slash=yes
     export vim_cv_memmove_handles_overlap=yes
     export vim_cv_uname_output="QNX"
-    export ac_cv_prog_STRIP=$CTARGET-strip
     export ac_cv_c_compiler_gnu=no
 
     ./configure \
