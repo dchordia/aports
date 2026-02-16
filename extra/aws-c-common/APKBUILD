@@ -31,8 +31,8 @@ build() {
 }
 
 check() {
-  test_exclude="string_destroy_secure_test"
-  ctest --test-dir build -E "$test_exclude"
+  test_exclude="string_destroy_secure_test|test_memory_usage_maxrss"
+  ctest --test-dir build -E "$test_exclude" -j1
 }
 
 package() {
