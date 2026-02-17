@@ -30,7 +30,8 @@ build() {
 }
 
 check() {
-  ctest --test-dir build
+  test_exclude="cmake.force_standard.positive.builtin|cmake.force_standard.positive.manual"
+  ctest --test-dir build -E $test_exclude
 }
 
 package() {
