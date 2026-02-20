@@ -8,19 +8,16 @@ pkgdesc="Aws Crypto Abstraction Layer: Cross-Platform, C99 wrapper for cryptogra
 url="https://github.com/awslabs/aws-c-cal"
 arch="all"
 license="Apache-2.0"
-depends="aws-c-common"
-depends_dev="aws-c-common-dev"
 makedepends="
-    $depends_dev
     cmake
     ninja
-    clang
+    aws-c-common-dev
+    openssl-dev
     "
 subpackages="$pkgname-dev"
 source="$pkgname-$pkgver.tar.gz::https://github.com/awslabs/aws-c-cal/archive/refs/tags/v$pkgver.tar.gz"
 
 build() {
-  CC="clang" \
   cmake -B build -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
@@ -36,6 +33,7 @@ check() {
 package() {
   DESTDIR="$pkgdir" cmake --install build
 }
+
 sha512sums="
 62b84c3bbe9deb1618c66e29f2211c4462fdd85a1a71d63cc815f57cdbde653e659435630471c067688bf0975825717ee1148ab4e1c25e764e37917fb59dff11  aws-c-cal-0.9.13.tar.gz
 "
