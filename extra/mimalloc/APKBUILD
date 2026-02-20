@@ -12,7 +12,6 @@ license="MIT"
 makedepends="
     cmake
     ninja
-    clang
 "
 subpackages="$pkgname-dev"
 source="$pkgname-$pkgver.tar.gz::https://github.com/microsoft/mimalloc/archive/refs/tags/v$pkgver.tar.gz
@@ -20,7 +19,6 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/microsoft/mimalloc/archive/r
         "
 
 build() {
-  CC=clang \
   cmake -B build -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
@@ -34,7 +32,7 @@ check() {
 }
 
 package() {
-  DESTDIR="$pkgir" cmake --install build
+  DESTDIR="$pkgdir" cmake --install build
 }
 
 sha512sums="
