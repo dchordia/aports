@@ -13,16 +13,12 @@ license="Apache-2.0"
 depends_dev="flatc=$pkgver-r$pkgrel"
 makedepends="
 	cmake
-	samurai
+	ninja
 	"
 subpackages="$pkgname-dev flatc"
 source="flatbuffers-$pkgver.tar.gz::https://github.com/google/flatbuffers/archive/v$pkgver.tar.gz
 	locale-headers.patch
 	"
-
-# secfixes:
-#   0:
-#     - CVE-2020-35864
 
 build() {
 	cmake -B . -G Ninja \
