@@ -1,0 +1,31 @@
+# Maintainer: Deep Chordia <dchordia@blackberry.com>
+pkgname=epoll
+pkgver=1.0.0
+pkgrel=0
+branch=main
+pkgdesc="epoll is a high-performance QNX polling API"
+arch="all"
+license="MIT"
+url="https://github.com/qnx-ports/epoll"
+makedepends="cmake ninja"
+subpackages="$pkgname-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/qnx-ports/epoll/archive/refs/heads/main.tar.gz"
+builddir="$srcdir/$pkgname-$branch"
+
+prepare() {
+  default_prepare
+
+  cp $srcdir/../Makefile $builddir
+}
+
+build() {
+  make
+}
+
+package() {
+  DESTDIR="$pkgdir" make install
+}
+
+sha512sums="
+6127dcaf0e255796af5944e0d333c2666418a0e0e2029e535cb3cca31b72d2e96233f4b04d75635e27ca9188f910c4d3ff4483f5def4af2720e1de7492233098  epoll-1.0.0.tar.gz
+"
