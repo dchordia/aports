@@ -3,12 +3,12 @@
 # Maintainer: nnarayanamurthy <nnarayanamurthy@qnx.com>
 pkgname=gflags
 pkgver=2.2.2
-pkgrel=2
+pkgrel=1
 pkgdesc="The gflags package contains a C++ library that implements commandline flags processing."
 url="https://gflags.github.io/gflags/"
 arch="all"
 license="BSD-3-Clause"
-makedepends="cmake samurai"
+makedepends="cmake ninja"
 subpackages="$pkgname-dev"
 source="gflags-$pkgver.tar.gz::https://github.com/gflags/gflags/archive/v$pkgver.tar.gz"
 
