@@ -12,7 +12,7 @@ url="https://wayland.freedesktop.org/"
 arch="all"
 license="MIT"
 depends_dev="$pkgname=$pkgver-r$pkgrel"
-depends="$_libname dbus libdisplay-info libjpeg-turbo libwebp libxkbcommon qnx-security pango wayland qnx-io-sock qnx-egl qnx-screen qnx-gles qnx-memstream qnx-fd-notify qnx-libdrm qnx-libgbm ncurses"
+depends="$_libname dbus libdisplay-info libjpeg-turbo libwebp libxkbcommon qnx-security pango wayland qnx-io-sock qnx-egl qnx-screen qnx-gles qnx-memstream qnx-fd-notify qnx-libdrm qnx-libgbm qnx-hid ncurses"
 makedepends="
 	dbus-dev
 	libdisplay-info-dev
