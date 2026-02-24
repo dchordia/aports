@@ -9,7 +9,6 @@ license="Apache-2.0"
 makedepends="
     cmake
     ninja
-    clang
     gtest-dev
 "
 subpackages="$pkgname-dev"
@@ -19,7 +18,6 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/eProsima/Fast-CDR/archive/re
 builddir="$srcdir/Fast-CDR-$pkgver"
 
 build() {
-  CC=clang \
   cmake -B build -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
