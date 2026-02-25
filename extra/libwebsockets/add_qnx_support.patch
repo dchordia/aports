@@ -1,0 +1,125 @@
+diff --git a/lib/CMakeLists.txt b/lib/CMakeLists.txt
+index 85b43d59..d7e3b2d8 100644
+--- a/lib/CMakeLists.txt
++++ b/lib/CMakeLists.txt
+@@ -167,6 +167,12 @@ if (LWS_WITH_STATIC)
+ 	target_include_directories(websockets PRIVATE ${LWS_LIB_BUILD_INC_PATHS})
+ 	target_compile_definitions(websockets PRIVATE LWS_BUILDING_STATIC)
+ 
++	if (NOT ${IOSOCK_VARIANT} STREQUAL "")
++		set_target_properties(websockets
++			PROPERTIES
++			OUTPUT_NAME websockets_iosock)
++	endif()
++
+ 	if (WIN32)
+ 		# Windows uses the same .lib ending for static libraries and shared
+ 		# library linker files, so rename the static library.
+@@ -199,6 +205,12 @@ if (LWS_WITH_SHARED)
+ 		PROPERTIES
+ 		OUTPUT_NAME websockets)
+ 
++	if (NOT ${IOSOCK_VARIANT} STREQUAL "")
++		set_target_properties(websockets_shared
++			PROPERTIES
++			OUTPUT_NAME websockets_iosock)
++	endif()
++
+ 	if (WIN32)
+ 		# Compile as DLL (export function declarations)
+ 		set_property(
+diff --git a/lib/misc/dir.c b/lib/misc/dir.c
+index 94a07ca9..cc037215 100644
+--- a/lib/misc/dir.c
++++ b/lib/misc/dir.c
+@@ -131,7 +131,7 @@ lws_dir(const char *dirpath, void *user, lws_dir_callback_function cb)
+ 	}
+ 
+ 	for (i = 0; i < n; i++) {
+-#if !defined(__sun)
++#if !defined(__sun) && !defined(__QNXNTO__)
+ 		unsigned int type = namelist[i]->d_type;
+ #endif
+ 		if (strchr(namelist[i]->d_name, '~'))
+@@ -143,7 +143,7 @@ lws_dir(const char *dirpath, void *user, lws_dir_callback_function cb)
+ 		 * files are LDOT_UNKNOWN
+ 		 */
+ 
+-#if defined(__sun)
++#if defined(__sun) || defined(__QNXNTO__)
+ 		lws_dir_via_stat(combo, l, namelist[i]->d_name, &lde);
+ #else
+ 		/*
+diff --git a/lib/plat/unix/private-lib-plat-unix.h b/lib/plat/unix/private-lib-plat-unix.h
+index 1aa9e807..74d633da 100644
+--- a/lib/plat/unix/private-lib-plat-unix.h
++++ b/lib/plat/unix/private-lib-plat-unix.h
+@@ -62,17 +62,7 @@
+ #include <net/if.h>
+ #endif
+ #if defined(__QNX__)
+-	#include <gulliver.h>
+-	#if defined(__LITTLEENDIAN__)
+-		#define BYTE_ORDER __LITTLEENDIAN__
+-		#define LITTLE_ENDIAN __LITTLEENDIAN__
+-		#define BIG_ENDIAN 4321  /* to show byte order (taken from gcc); for suppres warning that BIG_ENDIAN is not defined. */
+-	#endif
+-	#if defined(__BIGENDIAN__)
+-		#define BYTE_ORDER __BIGENDIAN__
+-		#define LITTLE_ENDIAN 1234  /* to show byte order (taken from gcc); for suppres warning that LITTLE_ENDIAN is not defined. */
+-		#define BIG_ENDIAN __BIGENDIAN__
+-	#endif
++#include <sys/param.h>
+ #endif
+ 
+ #if defined(LWS_HAVE_PTHREAD_H)
+@@ -134,11 +124,11 @@ typedef pthread_mutex_t lws_mutex_t;
+ #include <sys/syslog.h>
+ #endif
+ 
+-#ifdef __QNX__
+-# include "netinet/tcp_var.h"
+-# define TCP_KEEPINTVL TCPCTL_KEEPINTVL
+-# define TCP_KEEPIDLE  TCPCTL_KEEPIDLE
+-# define TCP_KEEPCNT   TCPCTL_KEEPCNT
++#if defined(__QNX__) && !defined(__BSD_VISIBLE)
++	# include <netinet/tcp_var.h>
++	# define TCP_KEEPINTVL TCPCTL_KEEPINTVL
++	# define TCP_KEEPIDLE  TCPCTL_KEEPIDLE
++	# define TCP_KEEPCNT   TCPCTL_KEEPCNT
+ #endif
+ 
+ #define LWS_ERRNO errno
+diff --git a/lib/plat/unix/unix-sockets.c b/lib/plat/unix/unix-sockets.c
+index 6c99b5ec..df20cf34 100644
+--- a/lib/plat/unix/unix-sockets.c
++++ b/lib/plat/unix/unix-sockets.c
+@@ -226,7 +226,8 @@ lws_plat_set_socket_options_ip(lws_sockfd_type fd, uint8_t pri, int lws_flags)
+       !defined(__OpenBSD__) && \
+       !defined(__sun) && \
+       !defined(__HAIKU__) && \
+-      !defined(__CYGWIN__)
++      !defined(__CYGWIN__) && \
++      !defined(__QNXNTO__)
+ 
+ 	/* the BSDs don't have SO_PRIORITY */
+ 
+diff --git a/test-apps/CMakeLists.txt b/test-apps/CMakeLists.txt
+index cb3c9804..2df4f890 100644
+--- a/test-apps/CMakeLists.txt
++++ b/test-apps/CMakeLists.txt
+@@ -114,7 +114,13 @@ if ((LWS_ROLE_H1 OR LWS_ROLE_H2))
+ 		set_target_properties(${TEST_NAME}
+ 			PROPERTIES
+ 			OUTPUT_NAME libwebsockets-${TEST_NAME})
+-			
++		
++		if (NOT ${IOSOCK_VARIANT} STREQUAL "")
++			set_target_properties(${TEST_NAME}
++				PROPERTIES
++				OUTPUT_NAME libwebsockets-${TEST_NAME}-iosock)
++		endif()
++		
+ 		target_link_libraries(${TEST_NAME} ${LIB_LIST_AT_END})
+ 
+ 		# Add to the list of tests.
