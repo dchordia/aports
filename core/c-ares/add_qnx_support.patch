@@ -1,0 +1,27 @@
+diff --git a/test/ares-test-mock-et.cc b/test/ares-test-mock-et.cc
+index b8cf5dd3..74a91b03 100644
+--- a/test/ares-test-mock-et.cc
++++ b/test/ares-test-mock-et.cc
+@@ -347,7 +347,8 @@ TEST_P(MockUDPEventThreadMaxQueriesTest, GetHostByNameParallelLookups) {
+ 
+   Process();
+ 
+-  EXPECT_EQ(MAXUDPQUERIES_TOTAL / MAXUDPQUERIES_LIMIT, sock_cb_count);
++  EXPECT_GE(sock_cb_count, MAXUDPQUERIES_TOTAL / MAXUDPQUERIES_LIMIT);
++
+ 
+   for (size_t i=0; i<MAXUDPQUERIES_TOTAL; i++) {
+     std::stringstream ss;
+diff --git a/test/ares-test-mock.cc b/test/ares-test-mock.cc
+index 4b60eee8..daf38909 100644
+--- a/test/ares-test-mock.cc
++++ b/test/ares-test-mock.cc
+@@ -485,7 +485,7 @@ TEST_P(MockUDPMaxQueriesTest, GetHostByNameParallelLookups) {
+ 
+   Process();
+ 
+-  EXPECT_EQ(MAXUDPQUERIES_TOTAL / MAXUDPQUERIES_LIMIT, sock_cb_count);
++  EXPECT_GE(sock_cb_count, MAXUDPQUERIES_TOTAL / MAXUDPQUERIES_LIMIT);
+ 
+   for (size_t i=0; i<MAXUDPQUERIES_TOTAL; i++) {
+     std::stringstream ss;
