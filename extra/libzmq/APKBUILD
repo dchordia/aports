@@ -2,7 +2,7 @@
 # Maintainer: Felix Lionardo <flionardo@qnx.com>
 pkgname=zeromq
 pkgver=4.3.5
-pkgrel=2
+pkgrel=0
 pkgdesc="The ZeroMQ messaging library and tools"
 url="https://zeromq.org/"
 arch="all"
@@ -25,7 +25,7 @@ build() {
 		-DENABLE_CURVE=ON \
 		-DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
 		-DCMAKE_EXE_LINKER_FLAGS="-lsocket" \
-        	-DCMAKE_SHARED_LINKER_FLAGS="-lsocket" \
+        -DCMAKE_SHARED_LINKER_FLAGS="-lsocket" \
 		-DWITH_DOC=OFF
 	cmake --build build
 
@@ -39,8 +39,6 @@ build() {
 		-DWITH_LIBSODIUM_STATIC=ON \
 		-DENABLE_CURVE=ON \
 		-DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-		-DCMAKE_EXE_LINKER_FLAGS="-lsocket" \
-                -DCMAKE_SHARED_LINKER_FLAGS="-lsocket" \
 		-DWITH_DOC=OFF
 	cmake --build build-static
 }
