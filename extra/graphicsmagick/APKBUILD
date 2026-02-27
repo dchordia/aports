@@ -17,6 +17,7 @@ depends="
     libwebp
     libwebp-tools
     libxml2
+	libjxl
     tiff
     xz-libs
     zlib-ng
@@ -30,6 +31,7 @@ makedepends="
 	libtool
 	libwebp-dev
 	libxml2-dev
+	libjxl-dev
 	tiff-dev
 	"
 subpackages="$pkgname-dev $pkgname-c++:cpp $pkgname-doc"
