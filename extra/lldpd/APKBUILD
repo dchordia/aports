@@ -1,5 +1,6 @@
-# Contributor: Francesco Colista <fcolista@alpinelinux.org>
-# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+# Alipne-Contributor: Francesco Colista <fcolista@alpinelinux.org>
+# Alipne-Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+# Maintainer: Marcin Sochacki <msochacki@qnx.com>
 pkgname=lldpd
 pkgver=1.0.19
 pkgrel=0
@@ -9,16 +10,17 @@ arch="all"
 license="ISC"
 makedepends="autoconf automake libtool 
 	libevent-dev libxml2-dev jansson-dev
-	perl-dev readline-dev"
+	perl-dev readline-dev check check-dev"
 subpackages="
 	$pkgname-dev
 	$pkgname-doc
 	$pkgname-bash-completion
+	$pkgname-zsh-completion
 	"
 pkgusers="lldpd"
 pkggroups="lldpd"
-source="$pkgname-$pkgver.tar.gz::https://github.com/qnx-ports/lldpd/archive/refs/tags/qnx-$pkgver-001.tar.gz"
-builddir="$srcdir/$pkgname-qnx-$pkgver-001"
+source="$pkgname-$pkgver.tar.gz::https://github.com/qnx-ports/lldpd/archive/refs/tags/qnx-$pkgver-1.tar.gz"
+builddir="$srcdir/$pkgname-qnx-$pkgver-1"
 
 prepare() {
 	# this should be shipped with the release tarball
@@ -31,8 +33,9 @@ build() {
 
 	export LDFLAGS="$LDFLAGS -lsocket -lregex"
 	./configure \
-		--host=x86_64-x86pc-nto-qnx8.0.0 \
-		--build=x86_64-x86pc-nto-qnx8.0.0 \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--sbindir=/usr/bin \
 		--prefix=/usr \
 		--localstatedir=/var \
 		--sysconfdir=/etc \
@@ -41,9 +44,9 @@ build() {
 	make
 }
 
-#check() {
-	#make check
-#}
+check() {
+	make check
+}
 
 package() {
 	install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
@@ -52,6 +55,6 @@ package() {
 
 
 sha512sums="
-94e2867cda134de3e4999d80f10ed701a1f9010637241a308530bb1aa5ef8cc47dc4f219802096d71a138a1bcaba8171f59b574068255698f8bc7a99d62020f5  lldpd-1.0.19.tar.gz
+e71256fc023746e88bf808442767a1425758e424e9c5c88828afb0bcb750053aaf48f36940f048aef21860408d7f073aed45878bc17581807482b9d89c2da779  lldpd-1.0.19.tar.gz
 "
 
