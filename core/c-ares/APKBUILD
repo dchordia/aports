@@ -42,6 +42,7 @@ package() {
 }
 
 utils() {
+	depends="$pkgname=$pkgver-r$pkgrel"
 	amove usr/bin
 }
 
