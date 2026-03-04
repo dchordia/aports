@@ -1,3 +1,4 @@
+# Maintainer: Felix Lionardo <flionardo@qnx.com>
 pkgname=asio
 pkgver=1.36.0
 pkgrel=0
@@ -16,8 +17,8 @@ build() {
     ./configure \
         --build=$CBUILD \
         --host=$CHOST \
-        --prefix=$PREFIX \
-        --mandir=$PREFIX/share/man \
+        --prefix=/usr \
+        --mandir=/usr/share/man \
         CXXFLAGS="$CXXFLAGS -O2 -DASIO_HAS_PTHREADS -DASIO_HAS_STD_STRING_VIEW \
                             -DASIO_HAS_CONSTEXPR -DASIO_HAS_STD_FUTURE_CLASS -DSA_RESTART=0 \
                             -Wno-deprecated-declarations -lsocket"
