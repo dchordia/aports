@@ -8,7 +8,7 @@ url="https://github.com/xtensor-stack/xtl"
 arch="noarch"
 license="BSD-3-Clause"
 depends="qnx-io-sock"
-makedepends="cmake ninja doctest-dev qnx-io-sock-dev"
+makedepends="cmake ninja doctest-dev qnx-io-sock-dev libc++-dev"
 source="$pkgname-qnx-$pkgver.tar.gz::https://github.com/qnx-ports/xtl/archive/refs/heads/qnx-$pkgver.tar.gz"
 builddir=$srcdir/$pkgname-qnx-$pkgver
 build() {
