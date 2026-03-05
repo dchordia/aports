@@ -7,10 +7,12 @@ pkgdesc="The ZeroMQ messaging library and tools"
 url="https://zeromq.org/"
 arch="all"
 license="MPL-2.0"
+depends="qnx-io-sock"
 makedepends="
 	ninja
 	cmake
 	perl
+	qnx-io-sock-dev
 	"
 subpackages="libzmq-static $pkgname-dev libzmq:libs"
 source="https://github.com/zeromq/libzmq/releases/download/v$pkgver/zeromq-$pkgver.tar.gz"
