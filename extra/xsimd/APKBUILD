@@ -9,7 +9,7 @@ url="https://github.com/xtensor-stack/xsimd"
 # only supports simd on these
 arch="all"
 license="BSD-3-Clause"
-makedepends="cmake gtest-dev ninja"
+makedepends="cmake gtest-dev ninja libc++-dev"
 checkdepends="doctest-dev"
 subpackages="$pkgname-dev"
 source="$pkgname-$pkgver.tar.gz::https://github.com/xtensor-stack/xsimd/archive/refs/tags/$pkgver.tar.gz"
