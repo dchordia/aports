@@ -20,7 +20,7 @@ build() {
         CXXFLAGS="$CXXFLAGS -O2 -DASIO_HAS_PTHREADS -DASIO_HAS_STD_STRING_VIEW \
                             -DASIO_HAS_CONSTEXPR -DASIO_HAS_STD_FUTURE_CLASS -DSA_RESTART=0 \
                             -Wno-deprecated-declarations" \
-	LIBS="$LIBS -lsocket"
+	    LIBS="$LIBS -lsocket"
     make
 }
 
