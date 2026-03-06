@@ -7,13 +7,11 @@ url="https://think-async.com/Asio/"
 arch="noarch"
 license="BSL-1.0"
 depends_dev="openssl-dev>3"
-makedepends="$depends_dev clang libc++-dev"
+makedepends="$depends_dev qnx-io-sock-dev libc++-dev"
 subpackages="$pkgname-dev"
 source="https://downloads.sourceforge.net/sourceforge/asio/asio-$pkgver.tar.bz2"
 
 build() {
-    CC=clang \
-    CXX=clang++ \
     ./configure \
         --build=$CBUILD \
         --host=$CHOST \
@@ -21,7 +19,8 @@ build() {
         --mandir=/usr/share/man \
         CXXFLAGS="$CXXFLAGS -O2 -DASIO_HAS_PTHREADS -DASIO_HAS_STD_STRING_VIEW \
                             -DASIO_HAS_CONSTEXPR -DASIO_HAS_STD_FUTURE_CLASS -DSA_RESTART=0 \
-                            -Wno-deprecated-declarations -lsocket"
+                            -Wno-deprecated-declarations" \
+	LIBS="$LIBS -lsocket"
     make
 }
 
