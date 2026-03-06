@@ -3,7 +3,7 @@
 # Maintainer: Deep Chordia <dchordia@blackberry.com>
 pkgname=openblas
 pkgver=0.3.31
-pkgrel=0
+pkgrel=1
 pkgdesc="OpenBLAS is an optimized BLAS library based on GotoBLAS2 1.13 BSD version."
 url="http://www.openmathlib.org/OpenBLAS/"
 arch="all"
@@ -11,6 +11,7 @@ license="BSD-3-Clause"
 depends_dev="
     flang-dev
     openmp-dev
+    libc++-dev
     "
 makedepends="
     $depends_dev
@@ -27,6 +28,21 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/OpenMathLib/OpenBLAS/archive
 builddir="$srcdir/OpenBLAS-$pkgver"
 
 build() {
+  openblas_binary="64"
+
+  case "$CARCH" in
+    x86_64)
+      openblas_arch="x86_64"
+      ;;
+    aarch64)
+      openblas_arch="arm64"
+      ;;
+    *)
+      echo "ERROR: unsupported architecture: $CARCH"
+      return 1
+      ;;
+  esac
+
   CC=clang \
   CXX=clang++ \
   CFLAGS="-Wno-unused" \
@@ -42,7 +58,9 @@ build() {
     -DUSE_OPENMP=ON \
     -DCPP_THREAD_SAFETY_TEST=ON \
     -DUSE_TLS=ON \
-    -DQNX=ON
+    -DQNX=ON \
+    -DARCH=$openblas_arch \
+    -DBINARY=$openblas_binary
   cmake --build build
 }
 
