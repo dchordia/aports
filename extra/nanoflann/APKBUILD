@@ -1,6 +1,4 @@
-# Alpine Maintainer: Simon Zeni <simon@bl4ckb0ne.ca>
 # Maintainer: Felix Lionardo <flionardo@qnx.com>
-
 pkgname=nanoflann
 pkgver=1.9.0
 pkgrel=0
