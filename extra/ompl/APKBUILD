@@ -1,7 +1,6 @@
 # Maintainer: Felix Lionardo <flionardo@qnx.com>
 pkgname=ompl
 pkgver=1.7.0
-_commit=348368ba116e9335e94fece0158948bf75bd159d
 pkgrel=0
 pkgdesc="The Open Motion Planning Library"
 url="https://ompl.kavrakilab.org"
@@ -14,8 +13,11 @@ makedepends="
   boost-dev
   eigen-dev
 "
-source="https://github.com/ompl/ompl/archive/$_commit.tar.gz"
-builddir="$srcdir/ompl-$_commit"
+source="$pkgname-$pkgver.tar.gz::https://github.com/ompl/ompl/archive/refs/tags/$pkgver.tar.gz
+0001-remove-boost.system-as-a-dependency.-unused-1306.patch
+0002-remove-boost.filesystem-as-a-dependency-and-use-std-.patch
+"
+builddir="$srcdir/$pkgname-$pkgver"
 
 build() {
       cd "$builddir"
@@ -41,5 +43,7 @@ check(){
 }
 
 sha512sums="
-5072657e2a8e9cce4888208a2221c8f62d55ea4801fae77aac83a8303fe124c9f2c3b9e4f50228ca78ebf3092b435255a82dbbb268679182d7199d67bab062db  348368ba116e9335e94fece0158948bf75bd159d.tar.gz
+359d0cb8d1a1735d608c8e10bbb233d80fdcc7ec0314a0b7bcb6b611592d0c6ebdb9dcd4aaf8da2369754cf50cc38347d2634305bc430abc07d7b981360990cf  ompl-1.7.0.tar.gz
+b3fc8aa80095542c9420e8a9bbf2257e407528b5cd491b5605fe2528cd7977167355f07ed1bed18c6f262e690aa361c3211a749989d6369c19c06d027e94202f  0001-remove-boost.system-as-a-dependency.-unused-1306.patch
+b3f61b81765ee89ed058cfe21bce80a5ec77b9d59948d104a73953b874b063887bec0f88b9d8f4253fe77a8996b42f3a068affa8b372aa54ec52594aab4e95b6  0002-remove-boost.filesystem-as-a-dependency-and-use-std-.patch
 "
