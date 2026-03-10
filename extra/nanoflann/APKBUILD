@@ -13,7 +13,7 @@ build() {
 	cmake -B build -G Ninja \
 		-DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_INSTALL_LIBDIR=lib \
-		-DCMAKE_BUILD_TYPE=Debug \
+		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_CXX_FLAGS="-fstack-clash-protection -Wformat -Werror=format-security" \
 		-DNANOFLANN_BUILD_TESTS="$(want_check && echo ON || echo OFF)"
 	cmake --build build
