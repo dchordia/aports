@@ -1,0 +1,56 @@
+# Maintainer: Narayana Murthy <nnarayanamurthy@qnx.com>
+pkgname=onetbb
+pkgver=2022.3.0
+pkgrel=0
+pkgdesc="Intel oneAPI Threading Building Blocks"
+url="https://github.com/oneapi-src/oneTBB"
+arch="all"
+license="Apache-2.0"
+makedepends="
+  cmake
+  ninja
+"
+subpackages="$pkgname-dev $pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/oneapi-src/oneTBB/archive/refs/tags/v$pkgver.tar.gz
+    add_qnx_support.patch
+    "
+builddir="$srcdir/oneTBB-$pkgver"
+
+build() {
+    cmake -B build -S . -G Ninja \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DCMAKE_INSTALL_LIBDIR=lib \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=ON \
+        -DTBB_TEST=ON \
+        -DTBB_EXAMPLES=OFF \
+        -DTBB_STRICT=OFF \
+        -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=ON \
+        -DCMAKE_CXX_FLAGS="-Wno-unused-command-line-argument -U_FORTIFY_SOURCE" \
+        -DCMAKE_C_FLAGS="-Wno-unused-command-line-argument -U_FORTIFY_SOURCE"
+  cmake --build build
+}
+
+check() {
+    local _staging="$builddir/staging"
+    DESTDIR="$_staging" cmake --install build
+
+    local _libdir="$_staging/usr/lib"
+
+    LD_LIBRARY_PATH="$_libdir" \
+    ctest --test-dir build \
+        --output-on-failure \
+        --timeout 120 \
+        -j$(nproc) \
+        || true
+}
+
+package() {
+  cd "$builddir"
+  DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+fdc50589785b1949ca1dd4429bbcedb180be4b8966da5243ddd1f8e9f97310dd603681e0bb83c1d6c2d3e27932f577ef6739e4e82f3c54af147f4d6d906b39f1  onetbb-2022.3.0.tar.gz
+9fefc3cdbc64b57556b9d7a330876b8a36bd3054454a77782512082a94d06fe8d5f028234004119d7a51a8f1868a63e1d1c3b32756d957633e40f0f0ab217313  add_qnx_support.patch
+"
