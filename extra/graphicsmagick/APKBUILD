@@ -22,6 +22,7 @@ depends="
     xz-libs
     zlib-ng
     zstd-libs
+	lcms2-plugins
   "
 makedepends="
 	freetype-dev
