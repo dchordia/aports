@@ -1,7 +1,6 @@
-# Maintainer: Felix Lionardo <you@example.com>
+# Maintainer: Felix Lionardo <flionardo@qnx.com>
 pkgname=ceres-solver
 pkgver=2.2.0
-_commit_ceres=f9b7b6651b108136a16df44d91fb31735645f5a7
 pkgrel=0
 pkgdesc="C++ library for large-scale nonlinear least squares problems"
 url="http://ceres-solver.org"
@@ -46,8 +45,7 @@ build() {
 }
 
 check() {
-    cd "$builddir"/build
-    ctest -j1 --output-on-failure
+    ctest --test-dir build -j1 --output-on-failure
 }
 
 package() {
