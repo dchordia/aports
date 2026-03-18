@@ -1,0 +1,71 @@
+pkgname=fastdds
+pkgver=2.14.4
+pkgrel=0
+pkgdesc="eProsima Fast DDS with bundled foonathan"
+url="https://github.com/eProsima/Fast-DDS"
+arch="all"
+license="Apache-2.0"
+pkgname=fastdds
+pkgver=2.14.4
+pkgrel=1
+
+makedepends="
+    build-base
+    cmake
+    ninja
+    fast-cdr-dev
+    foonathan-memory
+    foonathan-memory-vendor
+    asio-dev
+    openssl-dev
+    qnx-fs-notify-dev
+    tinyxml2
+    asio
+    qnx-fs-core-dev
+    gtest-dev
+"   
+
+# prepare() {
+#     default_prepare
+#     cd "$srcdir/Fast-DDS-$pkgver"
+#     patch -p1 < "$srcdir/0001-qnx-platform-adjustments.patch"
+# }
+source="
+    fastdds-$pkgver.tar.gz::https://github.com/eProsima/Fast-DDS/archive/refs/tags/v$pkgver.tar.gz
+    qnx.patch
+"
+
+builddir="$srcdir/Fast-DDS-$pkgver"
+
+build() {
+    cd "$builddir"
+
+    cmake -B build \
+        -S "$builddir" \
+        -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DBUILD_SHARED_LIBS=ON \
+        -DBUILD_TESTING=ON \
+        -DQNX=TRUE \
+        -DFASTDDS_USE_FILE_WATCH=OFF \
+        -DFASTDDS_PERSISTENCE=OFF \
+        -DEPROSIMA_BUILD_TESTS=ON \
+        -DSECURITY=OFF
+
+    cmake --build build
+}
+
+check() {
+    cd "$builddir/build"
+    ctest --output-on-failure -j$(nproc)
+}
+
+package() {
+    DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+f5cdbb9ebb18208f6ef68799934e1f2a7f7cdd547983769eacf30f29198ad5d4a31df5dfe011aab17886c4ef3108c36a5a9e493c568ce8fe6379df806d90877f  fastdds-2.14.4.tar.gz
+2f5887ff0f54a5cfa778e1f2a5fc637c5dd7c11bb186282528e0e99aa738d452f558a42b5e62b2b9508a0ce2d5014fff4284a4deb4f32d06c72732eddb675565  qnx.patch
+"

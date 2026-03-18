@@ -1,37 +1,18 @@
-# Maintainer: Felix Lionardo <flionardo@qnx.com>
 pkgname=asio
-pkgver=1.36.0
-pkgrel=1
-pkgdesc="Cross-platform C++ library for network programming"
+pkgver=1.29.0
+pkgrel=0
+pkgdesc="Standalone Asio C++ networking library (header-only)"
 url="https://think-async.com/Asio/"
 arch="noarch"
 license="BSL-1.0"
-depends_dev="openssl-dev>3"
-makedepends="$depends_dev qnx-io-sock-dev libc++-dev"
 subpackages="$pkgname-dev"
-source="https://downloads.sourceforge.net/sourceforge/asio/asio-$pkgver.tar.bz2"
 
-build() {
-    ./configure \
-        --build=$CBUILD \
-        --host=$CHOST \
-        --prefix=/usr \
-        --mandir=/usr/share/man \
-        CXXFLAGS="$CXXFLAGS -O2 -DASIO_HAS_PTHREADS -DASIO_HAS_STD_STRING_VIEW \
-                            -DASIO_HAS_CONSTEXPR -DASIO_HAS_STD_FUTURE_CLASS -DSA_RESTART=0 \
-                            -Wno-deprecated-declarations" \
-	    LIBS="$LIBS -lsocket"
-    make
-}
+builddir="$startdir/asio"
 
-check() {
-    make check || true
-}
+build() { :; }
+check() { :; }
 
 package() {
-    make DESTDIR="$pkgdir" install
+    mkdir -p "$pkgdir/usr/include"
+    cp -a "$builddir/include/"* "$pkgdir/usr/include/"
 }
-
-sha512sums="
-87cfe606a38d3b697a15dacc35e367f556fb9e36b3d80785ddf3b59b6d214417ea7d483586077e7023f732b57a1369e2eb9b0f13be8b3f9f8bfdd59005683510  asio-1.36.0.tar.bz2
-"
