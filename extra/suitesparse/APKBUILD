@@ -55,9 +55,8 @@ build() {
 }
 
 check() {
-	make tests || true
+    make tests
 }
-
 package() {
 	make install $_flags DESTDIR="$pkgdir"
 }
@@ -73,5 +72,5 @@ graphblas() {
 
 
 sha512sums="
-99cb7d899e70e634eefba112a6b1e3195ecfa39fe561c1406c3cdd73c0aed29e9fe5f4b09bc6ca96ab746c9d2879853880f7694529f252ee4eb215a08cccd75e  suitesparse-7.11.0.tar.gz
+75734f8d27d24e9670f8020ff2f4434bdd9153f74bb6f9bc2fcc8c98e1873f5d7749c20ab08707a55e9b7c2fec9268d093539846b7bd8a46a587aba90046a319  suitesparse-7.11.0.tar.gz
 "
