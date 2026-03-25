@@ -8,7 +8,7 @@ pkgdesc="The gflags package contains a C++ library that implements commandline f
 url="https://gflags.github.io/gflags/"
 arch="all"
 license="BSD-3-Clause"
-makedepends="cmake ninja"
+makedepends="cmake ninja libc++-dev"
 subpackages="$pkgname-dev"
 source="gflags-$pkgver.tar.gz::https://github.com/gflags/gflags/archive/v$pkgver.tar.gz"
 
