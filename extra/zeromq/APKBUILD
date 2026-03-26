@@ -12,6 +12,7 @@ makedepends="
 	ninja
 	cmake
 	perl
+	libc++-dev
 	qnx-io-sock-dev
 	"
 subpackages="libzmq-static $pkgname-dev libzmq:libs"
