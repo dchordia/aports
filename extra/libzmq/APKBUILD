@@ -46,7 +46,7 @@ build() {
 }
 
 check() {
-	ctest --test-dir build -E test_security_curve --timeout 300 -j1 || true
+	ctest --test-dir build -E "test_security_curve|test_system|test_connect_resolve|test_reconnect_ivl" --timeout 300 -j1
 }
 
 package() {
@@ -55,11 +55,6 @@ package() {
 	# just the readme
 	rm -r "$pkgdir"/usr/share/zmq
 }
-
-dev() {
-    default_dev
-}
-
 
 sha512sums="
 a71d48aa977ad8941c1609947d8db2679fc7a951e4cd0c3a1127ae026d883c11bd4203cf315de87f95f5031aec459a731aec34e5ce5b667b8d0559b157952541  zeromq-4.3.5.tar.gz
