@@ -25,6 +25,7 @@ depends="
 	lcms2-plugins
   "
 makedepends="
+	libc++-dev
 	freetype-dev
 	libheif-dev
 	libltdl
