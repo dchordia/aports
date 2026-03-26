@@ -17,7 +17,7 @@ depends="
     libwebp
     libwebp-tools
     libxml2
-	libjxl
+    libjxl
     tiff
     xz-libs
     zlib-ng
