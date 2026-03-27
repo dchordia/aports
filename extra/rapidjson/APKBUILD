@@ -1,5 +1,6 @@
-# Contributor: Jakub Jirutka <jakub@jirutka.cz>
-# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+# Alipne-Contributor: Jakub Jirutka <jakub@jirutka.cz>
+# Alipne-Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+# Maintainer: Marcin Sochacki <msochacki@qnx.com>
 # Note: This package contains only header files.
 pkgname=rapidjson
 pkgver=1.1.0
