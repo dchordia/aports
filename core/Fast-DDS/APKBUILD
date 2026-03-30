@@ -16,11 +16,11 @@ makedepends="
     fast-cdr-dev
     foonathan-memory
     foonathan-memory-vendor
-    asio-dev
+    asio-dev=1.29.0-r0
     openssl-dev
     qnx-fs-notify-dev
     tinyxml2-dev
-    asio
+    asio=1.29.0-r0
     qnx-fs-core-dev
     gtest-dev
 "   
