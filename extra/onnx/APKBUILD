@@ -1,0 +1,48 @@
+# Maintainer: Deep Chordia <dchordia@blackberry.com>
+pkgname=onnx
+pkgver=1.20.1
+pkgrel=0
+pkgdesc="Open standard for machine learning interoperability"
+url="https://onnx.ai"
+arch="all"
+license="Apache-2.0"
+makedepends="
+    cmake
+    ninja
+    protobuf-dev
+    gtest-dev
+    "
+subpackages="$pkgname-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/onnx/onnx/archive/refs/tags/v$pkgver.tar.gz"
+builddir="$srcdir/$pkgname-$pkgver"
+
+build() {
+  PROTOC_PATH="/usr/bin/protoc"
+  LDFLAFS="${LDFLAGS} -lregex" \
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DCMAKE_INSTALL_DATADIR=/usr/lib \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON \
+    -DONNX_CUSTOM_PROTOC_EXECUTABLE=${PROTOC_PATH} \
+    -DProtobuf_PROTOC_EXECUTABLE=${PROTOC_PATH} \
+    -DONNX_BUILD_TESTS=ON
+  cmake --build build
+}
+
+check() {
+  ctest --test-dir build
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+
+  install -Dm644 "$builddir"/onnx/*.proto -t "$pkgdir"/usr/include/onnx
+  install -Dm644 "$builddir"/onnx/*.proto3 -t "$pkgdir"/usr/include/onnx
+}
+
+sha512sums="
+4bbc4c09e4bb3eb6049d653ce49200564e8c5dcf1154a30f894f24e15f1986d1f2fe2f4ca32fe383c559e2a0b20681f33d649376bf63e4345df6972a2c78eac8  onnx-1.20.1.tar.gz
+"
