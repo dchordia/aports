@@ -21,6 +21,7 @@ depends_dev="
 	"
 makedepends="
 	$depends_dev
+	libc++-dev
 	cmake
 	m4
 	"
@@ -32,6 +33,10 @@ subpackages="
 source="$pkgname-$pkgver.tar.gz::https://github.com/qnx-ports/SuiteSparse/archive/refs/heads/qnx-v$pkgver.tar.gz"
 builddir="$srcdir/$_pkgname-qnx-v$pkgver"
 
+# Disable tests on aarch64 because of llvm bug
+case "$CARCH" in
+	aarch64) options="$options !check" ;;
+esac
 
 _flags="BLAS=-lopenblas LAPACK=-lopenblas"
 
