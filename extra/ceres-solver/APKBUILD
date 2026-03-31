@@ -26,6 +26,11 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/ceres-solver/ceres-solver/ar
 eigen-fix.patch"
 builddir="$srcdir/ceres-solver-$pkgver"
 
+# Disable tests on aarch64 because of llvm bug
+case "$CARCH" in
+	aarch64) options="$options !check" ;;
+esac
+
 build() {
     cd "$builddir"
 
