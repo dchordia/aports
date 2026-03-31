@@ -30,8 +30,8 @@ subpackages="
 	$pkgname-dev
 	$pkgname-graphblas
 	"
-source="$pkgname-$pkgver.tar.gz::https://github.com/qnx-ports/SuiteSparse/archive/refs/heads/qnx-v$pkgver.tar.gz"
-builddir="$srcdir/$_pkgname-qnx-v$pkgver"
+source="$pkgname-$pkgver.tar.gz::https://github.com/qnx-ports/SuiteSparse/archive/refs/tags/v$pkgver-qnx-20260331.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver-qnx-20260331"
 
 # Disable tests on aarch64 because of llvm bug
 case "$CARCH" in
@@ -76,6 +76,7 @@ graphblas() {
 }
 
 
+
 sha512sums="
-75734f8d27d24e9670f8020ff2f4434bdd9153f74bb6f9bc2fcc8c98e1873f5d7749c20ab08707a55e9b7c2fec9268d093539846b7bd8a46a587aba90046a319  suitesparse-7.11.0.tar.gz
+03640df312006c2fb53c1dcaa13eceb3a0bafc5c15100aa7bb47d377d986f0175f73de537a7685995ed31b476b41718858a5ae76036e93cc1a1fd960b7627cd1  suitesparse-7.11.0.tar.gz
 "
