@@ -77,8 +77,8 @@ package() {
   cd build
   python3 ../setup.py install --skip-build --root="$pkgdir"
 
-	cd "$pkgdir"/usr/lib/python3*/site-packages/onnxruntime/capi
-	ln -sfv ../../../../libonnxruntime_providers_shared.so ../../../../libonnxruntime.so.* .
+  cd "$pkgdir"/usr/lib/python3*/site-packages/onnxruntime/capi
+  ln -sfv ../../../../libonnxruntime_providers_shared.so ../../../../libonnxruntime.so.* .
 }
 
 py3() {
