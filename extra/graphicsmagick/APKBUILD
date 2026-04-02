@@ -23,6 +23,7 @@ depends="
     zlib-ng
     zstd-libs
 	lcms2-plugins
+	libc++
   "
 makedepends="
 	libc++-dev
