@@ -13,6 +13,7 @@ depends="
 	gmp
 	mpfr
 	openblas
+	libc++
 	"
 depends_dev="
 	gmp-dev
