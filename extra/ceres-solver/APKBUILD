@@ -12,6 +12,7 @@ depends="
   suitesparse-graphblas
   glog
   eigen
+  libc++
 "
 makedepends="
   cmake
