@@ -1,7 +1,7 @@
 # Maintainer: Felix Lionardo <flionardo@qnx.com>
 pkgname=ceres-solver
 pkgver=2.2.0
-pkgrel=0
+pkgrel=1
 pkgdesc="C++ library for large-scale nonlinear least squares problems"
 url="http://ceres-solver.org"
 arch="all"
@@ -14,13 +14,17 @@ depends="
   eigen
   libc++
 "
+depends_dev="
+  suitesparse-dev
+  glog-dev
+  eigen-dev
+"
 makedepends="
+  $depends_dev
   cmake
   ninja
   libc++-dev
-  eigen-dev
   gtest-dev
-  glog-dev
 "
 
 source="$pkgname-$pkgver.tar.gz::https://github.com/ceres-solver/ceres-solver/archive/refs/tags/$pkgver.tar.gz
