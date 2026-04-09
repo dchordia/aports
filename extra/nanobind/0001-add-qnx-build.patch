@@ -1,0 +1,13 @@
+diff --git a/cmake/nanobind-config.cmake b/cmake/nanobind-config.cmake
+index 521eb40..cdfb713 100644
+--- a/cmake/nanobind-config.cmake
++++ b/cmake/nanobind-config.cmake
+@@ -308,7 +308,7 @@ endfunction()
+ 
+ function (nanobind_lto name)
+   set_target_properties(${name} PROPERTIES
+-    INTERPROCEDURAL_OPTIMIZATION_RELEASE ON
++    INTERPROCEDURAL_OPTIMIZATION_RELEASE OFF
+     INTERPROCEDURAL_OPTIMIZATION_MINSIZEREL ON)
+ endfunction()
+ 

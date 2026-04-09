@@ -1,0 +1,50 @@
+# Maintainer: Deep Chordia <dchordia@blackberry.com>
+pkgname=nanobind
+pkgver=2.10.2
+pkgrel=0
+pkgdesc="tiny and efficient C++/Python bindings"
+url="https://github.com/wjakob/nanobind"
+arch="all"
+license="BSD-3-Clause"
+_depname=robin-map
+_depver=4ec1bf19c6a96125ea22062f38c2cf5b958e448e
+makedepends="
+    cmake
+    ninja
+"
+subpackages="$pkgname-dev"
+source="
+    $pkgname-$pkgver.tar.gz::https://github.com/wjakob/nanobind/archive/refs/tags/v$pkgver.tar.gz
+    $_depname-$_depver.tar.gz::https://github.com/Tessil/robin-map/archive/$_depver.tar.gz
+    0001-add-qnx-build.patch
+"
+builddir="$srcdir/$pkgname-$pkgver"
+
+prepare() {
+  mv "$srcdir"/$_depname-$_depver/* "$builddir"/ext/robin_map
+  default_prepare
+}
+
+build() {
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DNB_TEST_SHARED_BUILD=ON \
+    -DNB_TEST_FREE_THREADED=OFF
+  cmake --build build
+}
+
+check() {
+  _test_exclude="test04_subinterpreters"
+  pytest build/tests -k "not $_test_exclude"
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+8b9a98f659a2b852946247b5ab415432715e19d7be3932b401f9a9c65c68a0e8e513bc785b77114b1c43c2eb2b932858981156a4b850c8a5160c1bd47f5ac337  nanobind-2.10.2.tar.gz
+d1e5baf70b3100f0dea3c7004689a0ed5ee627fee83ada0b5d726b97336822b878f8802e2276637e61e40a72b2f7b3e470ec2d10e3f28baf572a3518c85d62eb  robin-map-4ec1bf19c6a96125ea22062f38c2cf5b958e448e.tar.gz
+5556727bc2cbca21605b7a2ed91777310e09ab532a855c1688e49452832b4a925df7fe7a96b7e560d3b58d3dd82f32b87013c228202fa08ee50a7300d232eb68  0001-add-qnx-build.patch
+"
