@@ -8,7 +8,7 @@ pkgdesc="Memory Efficient Serialization Library"
 url="https://flatbuffers.dev/"
 arch="all"
 license="Apache-2.0"
-depends_dev="flatc=$pkgver-$pkgrel"
+depends_dev="flatc=$pkgver-r$pkgrel"
 makedepends="
     cmake
     ninja
