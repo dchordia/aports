@@ -6,13 +6,27 @@ pkgdesc="Open standard for machine learning interoperability"
 url="https://onnx.ai"
 arch="all"
 license="Apache-2.0"
+depends_dev="
+    protobuf-dev
+    python3-numpy-dev
+    "
 makedepends="
+    $depends_dev
     cmake
     ninja
-    protobuf-dev
     gtest-dev
+    nanobind-dev
+    python3-setuptools
+    python3-wheel
     "
-subpackages="$pkgname-dev"
+depends="
+    python3-protobuf
+    python3-numpy
+    python3-ml_dtypes
+"
+subpackages="
+    $pkgname-dev
+    python3-$pkgname:py3"
 source="$pkgname-$pkgver.tar.gz::https://github.com/onnx/onnx/archive/refs/tags/v$pkgver.tar.gz"
 builddir="$srcdir/$pkgname-$pkgver"
 
@@ -26,10 +40,11 @@ build() {
     -DCMAKE_INSTALL_DATADIR=/usr/lib \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON \
-    -DONNX_CUSTOM_PROTOC_EXECUTABLE=${PROTOC_PATH} \
     -DProtobuf_PROTOC_EXECUTABLE=${PROTOC_PATH} \
     -DONNX_BUILD_TESTS=ON
   cmake --build build
+
+  python3 setup.py build
 }
 
 check() {
@@ -41,6 +56,13 @@ package() {
 
   install -Dm644 "$builddir"/onnx/*.proto -t "$pkgdir"/usr/include/onnx
   install -Dm644 "$builddir"/onnx/*.proto3 -t "$pkgdir"/usr/include/onnx
+
+  python3 setup.py install --skip-build --root="$pkgdir"
+}
+
+py3() {
+  pkgdesc="Generate $pkgname python3 bindings"
+  amove usr/lib/python*
 }
 
 sha512sums="
