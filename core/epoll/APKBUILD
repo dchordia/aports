@@ -7,16 +7,10 @@ pkgdesc="epoll is a high-performance QNX polling API"
 arch="all"
 license="MIT"
 url="https://github.com/qnx-ports/epoll"
-makedepends="cmake ninja"
+makedepends="cmake"
 subpackages="$pkgname-dev"
 source="$pkgname-$pkgver.tar.gz::https://github.com/qnx-ports/epoll/archive/refs/heads/main.tar.gz"
 builddir="$srcdir/$pkgname-$branch"
-
-prepare() {
-  default_prepare
-
-  cp $srcdir/../Makefile $builddir
-}
 
 build() {
   make
