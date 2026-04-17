@@ -30,7 +30,7 @@ build() {
 	cd "$srcdir/METIS-$pkgver"
 	cmake -B build \
 		-DCMAKE_INSTALL_PREFIX=/usr \
-		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_BUILD_TYPE=Release \
 		-DBUILD_SHARED_LIBS=ON \
 		-DGKLIB_PATH=/usr \
 		-DCMAKE_POLICY_VERSION_MINIMUM=3.5
