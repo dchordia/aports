@@ -1,0 +1,57 @@
+# Maintainer:Harshini Yarasi <hyarasi@qnx.com>
+pkgname=clapack
+pkgver=3.2.1
+pkgrel=0
+pkgdesc="ANSI C translation of LAPACK"
+url="https://www.netlib.org/clapack/"
+arch="all"
+license="BSD-3-Clause"
+makedepends="build-base"
+source="clapack-$pkgver.tgz::https://www.netlib.org/clapack/clapack.tgz
+        fix-xberla.patch
+        "
+builddir="$srcdir/CLAPACK-3.2.1"
+
+prepare() {
+	default_prepare
+	cd "$builddir"
+	cp make.inc.example make.inc
+
+	# Disable warnings
+	sed -i 's/CFLAGS = -O3/CFLAGS = -O3 -w/' make.inc
+
+	# FIX: add missing include to tstiee.c
+	sed -i '/#include "blaswrap.h"/a #include <string.h>' INSTALL/tstiee.c
+}
+
+build() {
+	cd "$builddir"
+	
+	# Force flags for sub-makes that ignore make.inc
+	export CFLAGS="-O3 -w -Wno-implicit-function-declaration"
+	
+	make f2clib
+	make blaslib
+	make lapacklib
+}
+check()
+{
+build
+}
+
+package() {
+    cd "$builddir"
+
+	mkdir -p "$pkgdir/usr/lib"
+	mkdir -p "$pkgdir/usr/include"
+
+	cp blas_*.a "$pkgdir/usr/lib/"
+	cp lapack_*.a "$pkgdir/usr/lib/"
+	cp F2CLIBS/libf2c.a "$pkgdir/usr/lib/"
+
+	cp -r INCLUDE/*.h "$pkgdir/usr/include/"
+}
+sha512sums="
+42254d84abccd75f113d44c30bfd7a9c46bc92d4aa7ad03e1b662fba2343e37522c6907ff8fb2ffbd08df08519ea216da1218eb5b773c80595e5eeb30d796bea  clapack-3.2.1.tgz
+76a0bb79a59dfb3772fab531a85d9c1d86e4cf91a7212e8c313f472aa15f4f117ae883bf01c966359e77be2f398986c2fef2e969a4314eecf64f933acdac92cc  fix-xberla.patch
+"
