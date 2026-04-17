@@ -1,0 +1,43 @@
+# Maintainer:Harshini Yarasi <hyarasi@qnx.com>
+pkgname=gklib  
+pkgver=0_git20260409
+_commit=8bd6bad750b2b0d90800c632cf18e8ee93ad72d7
+pkgrel=0  
+pkgdesc="A library of various helper routines and implementations of data structures"  
+url="https://github.com/KarypisLab/GKlib"  
+arch="all"  
+license="Apache-2.0"  
+makedepends="build-base cmake"  
+subpackages="$pkgname-dev"  
+source="
+$pkgname-$_commit.tar.gz::https://github.com/KarypisLab/GKlib/archive/$_commit.tar.gz
+
+"
+builddir="$srcdir/GKlib-$_commit"
+prepare() {
+	default_prepare
+	
+	sed -i 's/#define _XOPEN_SOURCE.*/#define _XOPEN_SOURCE 600/' string.c
+}
+
+build() {
+	cmake -B build \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DBUILD_SHARED_LIBS=ON \
+		-DCMAKE_POLICY_VERSION_MINIMUM=3.5
+	cmake --build build
+}
+check(){
+	 cd "$builddir"/build/test
+    ./gksort || return 1
+    ./strings || return 1
+}
+package() {  
+    cd build
+    make DESTDIR="$pkgdir" install  
+} 
+
+sha512sums="
+128cd9a48047b18b8013288162556f0b0f1d81845f5445f7cc62590ab28c06ee0a6c602cc999ce268ab27237eca3e8295df6432d377e45071946b98558872997  gklib-8bd6bad750b2b0d90800c632cf18e8ee93ad72d7.tar.gz
+"
