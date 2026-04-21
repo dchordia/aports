@@ -1,4 +1,4 @@
-# Maintainer:Harshini Yarasi <hyarasi@qnx.com>
+# Maintainer: Harshini Yarasi <hyarasi@qnx.com>
 pkgname=clapack
 pkgver=3.2.1
 pkgrel=0
