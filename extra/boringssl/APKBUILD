@@ -1,0 +1,55 @@
+# Maintainer: Harshini Yarasi <hyarasi@qnx.com>
+pkgname=boringssl
+
+_tag="0.20260327.0"
+pkgver="${_tag}"
+pkgrel=0
+pkgdesc="BoringSSL cryptographic library"
+url="https://boringssl.googlesource.com/boringssl"
+arch="all"
+license="Apache-2.0"
+
+makedepends="cmake ninja perl"
+depends="
+libc++
+qnx-gcc-libs
+qnx-io-sock
+qnx-microkernel
+"
+subpackages="$pkgname-dev"
+
+source="$pkgname-${_tag}.tar.gz::https://boringssl.googlesource.com/boringssl/+archive/refs/tags/${_tag}.tar.gz
+qnx-getentropy.patch
+qnx-benchmark.patch"
+
+builddir="$srcdir"
+
+prepare() {
+	 default_prepare
+}
+
+build(){
+    cmake -GNinja -B build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_C_FLAGS="-Wno-error " \
+        -DCMAKE_CXX_FLAGS="-Wno-error " \
+        -DCMAKE_EXE_LINKER_FLAGS="-lsocket"  
+      
+    ninja -C build  
+}
+
+check()
+{
+	build
+}
+
+package(){
+	DESTDIR="$pkgdir" ninja -C build install
+}
+sha512sums="
+593a80a56237f4631cd4e9f6dd636602d7d6c041855e603dbecce39647bd80ae2804bd438e9664e143d0d7d739baf1ab2724b90f6adc3a546f70b6cf49b718e5  boringssl-0.20260327.0.tar.gz
+ba006ffd107bcf308d23c3889edeb39532924e3cf891cc691ac2337b00758334e412ef2d2ce47e62b9398030378e14a4abc0afd55eec7d50587f8fafa5ba9d0f  qnx-getentropy.patch
+8ba0c9d1bdca4d5dd524f7274054b1882fe4fe1877d48dd87383b0940bc410b21f82674d725f9e69fee1c35c872ff9e7b8767c11d1089b99c1c8e2598e369b9b  qnx-benchmark.patch
+"
