@@ -10,8 +10,8 @@ makedepends="
     cmake
     ninja"
 subpackages="$pkgname-dev"
-source="$pkgname-$pkgver.tar.gz::https://github.com/OpenAMP/libmetal/archive/refs/tags/v$pkgver.tar.gz
-        0001-add-qnx-support.patch"
+source="$pkgname-$pkgver.tar.gz::https://github.com/qnx-ports/libmetal/archive/refs/heads/qnx-v$pkgver.tar.gz"
+builddir="$srcdir/$pkgname-qnx-v$pkgver"
 
 build() {
   if [ -f "/usr/include/sys/cache.h" ]; then
@@ -43,6 +43,5 @@ package() {
 }
 
 sha512sums="
-5227b18821525e870ac0cb925e56ae6837bcd626ffb97d7f8da0998a25330a3829d76ec4f6596713c6634553bbeda29382f2642a9facca5a06ed74094bfd51d0  libmetal-2025.10.1.tar.gz
-f7f132e1e0bc11696463f63fe0e20e77e9e14d61b9d07e437d2ed98952d50cf71faec1d2e2df92c7ffcf0065b73d84214e88a1b861d13d90d676302169982d82  0001-add-qnx-support.patch
+6558f4b6793df631509436e81ff1b25c7a985a16f83e1f41241d61add1815d9399a54526cc954ba522698c54bec6f3067deb2685ad6121b90534bf2a1bed010c  libmetal-2025.10.1.tar.gz
 "
