@@ -9,7 +9,7 @@ pkgdesc="A 3D Collision Detection and Rigid Body Dynamics Library for games and 
 url="https://pybullet.org/Bullet/phpBB3/"
 arch="all"
 license="Zlib"
-depends="libc++libsysv-ipc-shim qnx-io-sock graphviz"
+depends="libc++ libsysv-ipc-shim qnx-io-sock graphviz"
 makedepends="
 	libc++-dev
 	libsysv-ipc-shim-dev
@@ -43,7 +43,7 @@ build() {
 		-DCMAKE_EXE_LINKER_FLAGS="-lsocket -lsysv-ipc" \
 		-DCMAKE_SHARED_LINKER_FLAGS="-lsocket -lsysv-ipc"
 
-	cmake --build build
+	cmake3.5 --build build
 }
 
 package() {
