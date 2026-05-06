@@ -6,14 +6,16 @@ pkgdesc="Optimization solver for Quadratic Programs (QPs)"
 url="https://github.com/osqp/osqp"
 arch="aarch64 x86_64"
 license="Apache-2.0"
-options="!check" # Cannot build tests
-source="$pkgname-$pkgver.tar.gz::https://github.com/osqp/osqp/releases/download/v$pkgver/osqp-v$pkgver-src.tar.gz"
+source="$pkgname-$pkgver.tar.gz::https://github.com/osqp/osqp/releases/download/v$pkgver/osqp-v$pkgver-src.tar.gz
+scipy-test-fix.patch"
 builddir="$srcdir"
 depends="libc++"
 makedepends="
 	libc++-dev
 	cmake
 	ninja
+	python3-numpy
+	python3-scipy
 "
 subpackages="$pkgname-dev"
 
@@ -22,7 +24,8 @@ build() {
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_INSTALL_LIBDIR=lib \
-		-DUNITTESTS=OFF
+		-DUNITTESTS=ON \
+		-DENABLE_MKL_PARDISO=OFF
 	cmake3.5 --build build
 }
 
@@ -36,4 +39,5 @@ package() {
 
 sha512sums="
 3176e87d71731d523d16706a404f087c7dd076a74b6dab6172e568ae4d945cb81591ce88aaad53926762c342f2981b8269c7fa1a0b9528675d3823fb2b996fb7  osqp-0.6.3.tar.gz
+8e826fc7e068b2ea94d4da2ae6035eb29ef14d4cf82eff2a9c4879aaaaeed957d63e1cc48ab652f24770d63e1541b14ca76c61b1a28298119f4a9289a10e4d7e  scipy-test-fix.patch
 "
