@@ -4,7 +4,7 @@
 # Maintainer: Felix Lionardo <flionardo@qnx.com>
 pkgname=bullet
 pkgver=3.25
-pkgrel=3
+pkgrel=0
 pkgdesc="A 3D Collision Detection and Rigid Body Dynamics Library for games and animation"
 url="https://pybullet.org/Bullet/phpBB3/"
 arch="all"
