@@ -7,7 +7,7 @@ url="https://github.com/osqp/osqp"
 arch="aarch64 x86_64"
 license="Apache-2.0"
 source="$pkgname-$pkgver.tar.gz::https://github.com/osqp/osqp/releases/download/v$pkgver/osqp-v$pkgver-src.tar.gz
-scipy-test-fix.patch"
+0001-scipy-test-fix.patch"
 builddir="$srcdir"
 depends="libc++"
 makedepends="
@@ -39,5 +39,5 @@ package() {
 
 sha512sums="
 3176e87d71731d523d16706a404f087c7dd076a74b6dab6172e568ae4d945cb81591ce88aaad53926762c342f2981b8269c7fa1a0b9528675d3823fb2b996fb7  osqp-0.6.3.tar.gz
-8e826fc7e068b2ea94d4da2ae6035eb29ef14d4cf82eff2a9c4879aaaaeed957d63e1cc48ab652f24770d63e1541b14ca76c61b1a28298119f4a9289a10e4d7e  scipy-test-fix.patch
+5d2b58c704c8365e577c943ecf097c3fccd3304283051a8abc7754bbec46b9a1bfcca032557111a226a98709d093733700e59f0ceda4e43f4c4469d61453fe94  0001-scipy-test-fix.patch
 "
