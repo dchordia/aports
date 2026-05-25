@@ -1,0 +1,67 @@
+# Contributor: Cris Sinnott <cris.sinnott@gmail.com>
+# Maintainer: Cris Sinnott <cris.sinnott@gmail.com>
+pkgname=shaderc
+pkgver=2026.2
+pkgrel=0
+pkgdesc="Collection of tools, libraries and tests for shader compilation"
+options="!check" # Tests require third-party test infrastructure not available on QNX
+url="https://github.com/google/shaderc"
+arch="x86_64"
+license="Apache-2.0"
+depends="glslang-libs spirv-tools"
+makedepends="cmake clang python3 glslang-dev spirv-tools-dev"
+subpackages="$pkgname-static $pkgname-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/google/shaderc/archive/refs/tags/v$pkgver.tar.gz"
+builddir="$srcdir/shaderc-$pkgver"
+
+prepare() {
+	default_prepare
+
+	# Use system glslang and spirv-tools instead of bundled third-party copies
+	sed -i -e '/add_subdirectory(third_party)/d' CMakeLists.txt
+
+	# Disable git-based version string generation (no .git in extracted tarball)
+	sed -i -e '/build-version/d' glslc/CMakeLists.txt
+
+	# Generate build-version.inc manually — displayed by 'glslc --version'
+	_glslang_ver="$( . $startdir/../glslang/APKBUILD; echo $pkgver)"
+	_spirv_ver="$( . $startdir/../spirv-tools/APKBUILD; echo $pkgver)"
+	cat <<- EOF > glslc/src/build-version.inc
+		"shaderc $pkgver\n"
+		"SPIRV-Tools $_spirv_ver\n"
+		"glslang $_glslang_ver\n"
+	EOF
+}
+
+build() {
+	cmake -B build \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_C_COMPILER=clang \
+		-DCMAKE_CXX_COMPILER=clang++ \
+		-DCMAKE_CXX_FLAGS="-stdlib=libc++" \
+		-DBUILD_SHARED_LIBS=ON \
+		-DSHADERC_SKIP_TESTS=ON \
+		-DSHADERC_SKIP_COPYRIGHT_CHECK=ON \
+		-DSHADERC_ENABLE_EXAMPLES=OFF \
+		-Dglslang_SOURCE_DIR=/usr/include/glslang
+	cmake --build build --parallel $(nproc)
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+dev() {
+	default_dev
+}
+
+static() {
+	pkgdesc="$pkgdesc (static libraries)"
+	amove usr/lib/*.a
+}
+
+sha512sums="
+733f85a83db4b71814c7f251c44e6010b485ed03d7e2389db5c14f8426942bebf6c95a35e5eaef80e51c29f8efa28cc0577226344630a427553200c6a87349ec  shaderc-2026.2.tar.gz
+"

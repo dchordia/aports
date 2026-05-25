@@ -1,0 +1,59 @@
+# Contributor: Cris Sinnott <cris.sinnott@gmail.com>
+# Maintainer: Cris Sinnott <cris.sinnott@gmail.com>
+pkgname=glslang
+pkgver=1.4.341.0
+pkgrel=0
+pkgdesc="Khronos reference front-end for GLSL, ESSL, and sample SPIR-V generator"
+url="https://github.com/KhronosGroup/glslang"
+arch="x86_64"
+license="BSD-3-Clause AND BSD-2-Clause AND MIT AND Apache-2.0 AND GPL-3.0-or-later"
+depends_dev="$pkgname=$pkgver-r$pkgrel"
+makedepends="cmake clang python3 spirv-tools-dev"
+subpackages="$pkgname-static $pkgname-libs $pkgname-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/KhronosGroup/glslang/archive/refs/tags/vulkan-sdk-$pkgver.tar.gz"
+builddir="$srcdir/glslang-vulkan-sdk-$pkgver"
+
+build() {
+	# Build shared libraries
+	cmake -B build-shared \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_BUILD_TYPE=MinSizeRel \
+		-DCMAKE_C_COMPILER=clang \
+		-DCMAKE_CXX_COMPILER=clang++ \
+		-DCMAKE_CXX_FLAGS="-stdlib=libc++" \
+		-DBUILD_EXTERNAL=OFF \
+		-DBUILD_SHARED_LIBS=ON \
+		-DALLOW_EXTERNAL_SPIRV_TOOLS=YES \
+		-DGLSLANG_TESTS=OFF
+	cmake --build build-shared --parallel $(nproc)
+
+	# Build static libraries (llama.cpp links statically against glslang)
+	cmake -B build-static \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_BUILD_TYPE=MinSizeRel \
+		-DCMAKE_C_COMPILER=clang \
+		-DCMAKE_CXX_COMPILER=clang++ \
+		-DCMAKE_CXX_FLAGS="-stdlib=libc++" \
+		-DBUILD_EXTERNAL=OFF \
+		-DBUILD_SHARED_LIBS=OFF \
+		-DALLOW_EXTERNAL_SPIRV_TOOLS=YES \
+		-DGLSLANG_TESTS=OFF
+	cmake --build build-static --parallel $(nproc)
+}
+
+check() {
+	# Tests disabled — test infrastructure not available on QNX 8.0
+	:
+}
+
+package() {
+	# Install static first so shared overwrites the executables
+	DESTDIR="$pkgdir" cmake --install build-static
+	DESTDIR="$pkgdir" cmake --install build-shared
+}
+
+sha512sums="
+f243830836f0ba6f13d6e2ccb48cee3c41f8478e0315b190f3a8e607d3723e7e687102126131a7ecc6eed5899b9de1b69c76f6f795f0f13703931e5041c47906  glslang-1.4.341.0.tar.gz
+"
