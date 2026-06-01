@@ -4,7 +4,6 @@
 pkgname=godot
 pkgver=4.4.1
 pkgrel=1
-_commit="ba76ea7562d186371a487d819d96038b54597cd6"
 pkgdesc="Multi-platform 2D and 3D game engine"
 url="https://godotengine.org"
 license="MIT"
@@ -64,8 +63,8 @@ depends="
     wayland
 "
 subpackages="$pkgname-doc $pkgname-templates"
-source="https://github.com/qnx-ports/godot-QNX/archive/$_commit.tar.gz"
-builddir="$startdir"/src/godot-QNX-"$_commit"
+source="https://github.com/qnx-ports/godot-QNX/archive/refs/tags/qnx-$pkgver-r$pkgrel.tar.gz"
+builddir="$startdir/src/godot-QNX-qnx-$pkgver-r$pkgrel"
 _sconsflags="
     module_camera_enabled=false
     builtin_brotli=false
@@ -194,5 +193,5 @@ templates() {
 }
 
 sha512sums="
-a1581301624ea97baf877a79337cefdb8442a36521dda31438939e545fbcec0a6772a5e6873bec187f8b762316068bd4b7b9da7e2d352352980ca96d260df25c  ba76ea7562d186371a487d819d96038b54597cd6.tar.gz
+47d09f2c982c7cf233a23d2dc6cb6fa3a4764768698f29cd2ac941094cef55667d465d9ff2ec57ccd3e0bcd1d620d597745285401218ffa6b012554371215eb8  qnx-4.4.1-r1.tar.gz
 "
