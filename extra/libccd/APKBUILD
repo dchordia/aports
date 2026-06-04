@@ -4,10 +4,11 @@ pkgver=2.1
 pkgrel=0
 pkgdesc="Library for collision detection between two convex shapes (libccd / ccd)"
 url="https://github.com/danfis/libccd"
-arch="aarch64 x86_64"
+arch="all"
 license="BSD-3-Clause"
 source="$pkgname-$pkgver.tar.gz::https://github.com/danfis/libccd/archive/refs/tags/v$pkgver.tar.gz"
 builddir="$srcdir/$pkgname-$pkgver"
+depends="libc++"
 makedepends="
 	libc++-dev
 	cmake
