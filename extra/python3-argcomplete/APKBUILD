@@ -17,9 +17,6 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/kislyuk/$_pyname/archive/v$p
 	"
 builddir="$srcdir/$_pyname-$pkgver"
 
-replaces="python3-argcomplete" # Backwards compatibility
-provides="python3-argcomplete=$pkgver-r$pkgrel" # Backwards compatibility
-
 build() {
 	python3 setup.py build
 }
