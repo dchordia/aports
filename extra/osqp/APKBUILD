@@ -14,9 +14,8 @@ makedepends="
 	libc++-dev
 	cmake
 	ninja
-	python3-numpy
-	python3-scipy
 "
+checkdepends="python3-scipy openblas-dev"
 subpackages="$pkgname-dev"
 
 build() {
