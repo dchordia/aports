@@ -26,8 +26,8 @@ source="bullet3-$pkgver.tar.gz::https://github.com/bulletphysics/bullet3/archive
 builddir="$srcdir/bullet3-$pkgver"
 
 build() {
-	export CFLAGS="${CFLAGS//-fstack-clash-protection/ }"
-	export CXXFLAGS="${CXXFLAGS//-fstack-clash-protection/ }"
+	export CFLAGS="$CFLAGS -Qunused-arguments"
+	export CXXFLAGS="$CXXFLAGS -Qunused-arguments"
 	cmake3.5 -B build -G Ninja -Wno-dev \
 		-DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_BUILD_TYPE=None \
