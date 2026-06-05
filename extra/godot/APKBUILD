@@ -95,8 +95,10 @@ _sconsflags="
 
 case "$CARCH" in
 x86_64)
+    _arch=x86_64
     ;;
-*)
+aarch64)
+    _arch=arm64
     # only builds on x86_64
     _sconsflags="$_sconsflags module_denoise_enabled=false"
     ;;
@@ -137,14 +139,7 @@ build() {
 }
 
 check() {
-    case "$CARCH" in
-    x86_64)
-        ./bin/godot.linuxbsd.editor.x86_64.llvm --test --test-case-exclude="[JSON] Serialization,[String] Number to string,*[IP] resolve_hostname*"
-        ;;
-    aarch64)
-        ./bin/godot.linuxbsd.editor.arm64.llvm --test --test-case-exclude="[JSON] Serialization,[String] Number to string,*[IP] resolve_hostname*"
-        ;;
-    esac
+    ./bin/godot.linuxbsd.editor.${_arch}.llvm --test --test-case-exclude="[JSON] Serialization,[String] Number to string,*[IP] resolve_hostname*"
 }
 
 package() {
