@@ -7,8 +7,8 @@ url="https://github.com/qnx-ports/libusb"
 arch="all"
 license="LGPL-2.1-or-later"
 
-makedepends="autoconf automake libtool pkgconf ninja libc++-dev"
-depends="libc++"
+makedepends="autoconf automake libtool pkgconf ninja libc++-dev qnx-usb-dev qnx-libpci-dev"
+depends="libc++ qnx-usb  qnx-libpci"
 
 subpackages="$pkgname-dev"
 
