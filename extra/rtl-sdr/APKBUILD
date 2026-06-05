@@ -7,9 +7,9 @@ url="https://github.com/qnx-ports/rtl-sdr"
 arch="all"
 license="GPL-2.0-or-later"
 
-makedepends=" libusb-dev libc++-dev "
-depends="libc++ libusb"
-
+makedepends=" libusb-dev libc++-dev qnx-io-sock-dev "
+depends="libc++ libusb qnx-io-sock"
+subpackages="$pkgname-dev"
 source="$pkgname-$pkgver.tar.gz::https://github.com/qnx-ports/rtl-sdr/archive/refs/heads/qnx_2.0.2.tar.gz"
 
 builddir="$srcdir/rtl-sdr-qnx_2.0.2"
