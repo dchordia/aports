@@ -268,6 +268,7 @@ prepare() {
     }
 
     _apply_qnx_patch src/cyclonedds cyclonedds.patch
+    _apply_qnx_patch src/class_loader class_loader.patch 
     _apply_qnx_patch src/resource_retriever libcurl_vendor.patch
     _apply_qnx_patch src/rcutils rcutils.patch
     _apply_qnx_patch src/rcl rcl.patch
@@ -279,7 +280,7 @@ build() {
 	cd "$builddir"
 	export CXXFLAGS="${CXXFLAGS//-fstack-clash-protection/}"
 	export CFLAGS="${CFLAGS//-fstack-clash-protection/}"
-	export LDFLAGS="-lsocket -lfsnotify -lc++ -lc++abi -Wl,-E -Wl,--no-as-needed"
+	export LDFLAGS="-lsocket -lfsnotify -lc++ -lc++abi -Wl,-E"
 	export CMAKE_COMMAND=/usr/bin/cmake3.5
 	colcon build --merge-install \
 		--cmake-args \
@@ -417,7 +418,7 @@ c2e864a5c5ab55f5ec205c83477959bbe06d45807af270106b7485e65ebece189cd91d57201a507e
 4f48ce41c7de2a36cb9108e4ca0217b49f224d3bbb830ded1bb8b626952c445f737a79801e4f56090b58f01476af46f1db532555294a914eff4b9290b6d8796b  unique_identifier_msgs.tar.gz
 281dc797ecdf312c4188b3d8d36ae93f1bb0860c60847a44e8d23b980ab85b9ecd729a8bd168a9e00b2517b7bc7732179bbcc3cbb0cf78f0ce97fd8352610d73  urdf.tar.gz
 5f6e18e124162eab21035109ef6406225a0f6e9d280dd8722535a5520519a736b10e9181db1d0eb3cb2e0737f4214579acb04fb841cb2f356346de5a74160a7b  yaml_cpp_vendor.tar.gz
-5db6c2905335f7902aab46646e7c902099cdab42ea6da2dbd12b7b478a638d633eb2133147a6eb68f6d02915345b52958e943780fb162ca4b54118c70a09e54c  class_loader.patch
+00b925bbf4c7058fcc0bee0f3d7ad6e710cb024e1ae9cfcc6925215ed02bb9b7990e39cf9b0fe41a6942b8a28d718c4ac82c1e3070bdc2904a4bf4926ffac9ec  class_loader.patch
 6cb086c12a59409323a66b238891d2cb5bd7112eb28fd68c2a652263ee5527149db3dc97cac64549644854d5917e0b87f658ac6dd4663c2c585e34035c0d4624  cyclonedds.patch
 2f8100683eb9885bb783214fbd4ce1627a586a4fe381bbf27c84b2f7e6b8b763bb8ce79a6de598fc9325f4abe5aa2d8f11b68fafb299391aac0dc28aa90fa9c7  libcurl_vendor.patch
 d1dd3d0b2b52af53ec0d4a3ba96f671e9f9e07efb0f070737c9748e7d52ab38f864ed7a4c13874e5d20f0ed8454641b95a31dcd458f969a3859a1bf347175ef4  rcl.patch
