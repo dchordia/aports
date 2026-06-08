@@ -1,0 +1,54 @@
+pkgname=librealsense
+pkgver=2.58.1
+pkgrel=0
+pkgdesc="Intel RealSense SDK 2.0"
+url="https://github.com/IntelRealSense/librealsense"
+arch="all"
+license="Apache-2.0"
+
+makedepends="
+	cmake
+	libusb-dev
+"
+
+source="
+	$pkgname-$pkgver.tar.gz::https://github.com/IntelRealSense/librealsense/archive/refs/tags/v$pkgver.tar.gz
+	librealsense.patch
+"
+
+builddir="$srcdir/librealsense-$pkgver"
+
+prepare() {
+	cd "$builddir"
+	patch -p1 < ../librealsense.patch
+}
+
+build() {
+	cd "$builddir"
+
+	# remove problematic flags for QNX
+	CFLAGS=$(echo "$CFLAGS" | sed 's/-fstack-clash-protection//g')
+	CXXFLAGS=$(echo "$CXXFLAGS" | sed 's/-fstack-clash-protection//g')
+
+	cmake -B build -S . \
+		-DFORCE_RSUSB_BACKEND=ON \
+		-DBUILD_SHARED_LIBS=ON \
+		-DBUILD_EXAMPLES=OFF \
+		-DBUILD_GRAPHICAL_EXAMPLES=OFF \
+		-DBUILD_TOOLS=OFF \
+		-DCMAKE_C_FLAGS="$CFLAGS -DPLATFORM_POSIX" \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_CXX_FLAGS="$CXXFLAGS -DPLATFORM_POSIX"
+
+	cmake --build build
+}
+
+package() {
+	cd "$builddir"
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+bd9a14a96b0b826b18dc3850cfaa82ea10e3e0c23f211fb04d1ab116d37a10789ef624737573b633fd8a881ad3f9daa66accf2bd370df82ab5eafee66b71bd66  librealsense-2.58.1.tar.gz
+c565539dc67164790897c0dc3ac1142e9606a2b4d018def2889c86266f8696d1605c3546f3d99292db3eaa2aab9042a26f179f1733d77e06465304310ad05f57  librealsense.patch
+"
