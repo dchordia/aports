@@ -1,0 +1,98 @@
+diff --git a/include/behaviortree_cpp/blackboard.h b/include/behaviortree_cpp/blackboard.h
+index c8892440..fc2560e3 100644
+--- a/include/behaviortree_cpp/blackboard.h
++++ b/include/behaviortree_cpp/blackboard.h
+@@ -333,8 +333,19 @@ inline void Blackboard::set(const std::string& key, const T& value)
+ 
+     std::type_index previous_type = entry.info.type();
+ 
+-    // check type mismatch
+-    if(previous_type != std::type_index(typeid(T)) && previous_type != new_value.type())
++    auto type_matches = [](const std::type_index& a, const std::type_index& b) -> bool {
++      if(a == b) {
++        return true;
++      }
++      if(a.name() != nullptr && b.name() != nullptr) {
++        return std::string(a.name()) == std::string(b.name());
++      }
++      return false;
++    };
++    
++    //check type mismatch
++    if(!type_matches(previous_type, std::type_index(typeid(T))) && 
++       !type_matches(previous_type, new_value.type()))
+     {
+       bool mismatching = true;
+       if(std::is_constructible<StringView, T>::value)
+diff --git a/include/behaviortree_cpp/contrib/any.hpp b/include/behaviortree_cpp/contrib/any.hpp
+index 910aadd9..7a3551fd 100644
+--- a/include/behaviortree_cpp/contrib/any.hpp
++++ b/include/behaviortree_cpp/contrib/any.hpp
+@@ -22,6 +22,8 @@
+ #include <utility>
+ #include <new>
+ #include <array>
++#include <string>
++#include <cstring>
+ 
+ #if defined(PARTICLE)
+ #if !defined(__cpp_exceptions) && !defined(ANY_IMPL_NO_EXCEPTIONS) && !defined(ANY_IMPL_EXCEPTIONS)
+@@ -369,7 +371,14 @@ protected:
+ #ifdef ANY_IMPL_FAST_TYPE_INFO_COMPARE
+         return &a == &b;
+ #else
+-        return a == b;
++        if (a == b) {
++            return true;
++        }
++        // Fallback: compare type names
++        if (a.name() != nullptr && b.name() != nullptr) {
++            return std::string(a.name()) == std::string(b.name());
++        }
++        return false;
+ #endif
+     }
+ #endif
+diff --git a/include/behaviortree_cpp/utils/safe_any.hpp b/include/behaviortree_cpp/utils/safe_any.hpp
+index 3a87caf8..cbccaab0 100644
+--- a/include/behaviortree_cpp/utils/safe_any.hpp
++++ b/include/behaviortree_cpp/utils/safe_any.hpp
+@@ -24,6 +24,7 @@
+ #include "behaviortree_cpp/utils/strcat.hpp"
+ 
+ #include <memory>
++#include <cstdio>
+ #include <string>
+ #include <type_traits>
+ #include <typeindex>
+@@ -362,8 +363,17 @@ inline void Any::copyInto(Any& dst) const
+   }
+ 
+   const auto& dst_type = dst.castedType();
++  const auto same_type = [&dst_type, this]() -> bool {
++    if (castedType() == dst_type) {
++      return true;
++    }
++    if (castedType().name() != nullptr && dst_type.name() != nullptr) {
++      return std::string(castedType().name()) == std::string(dst_type.name());
++    }
++    return false;
++  };
+ 
+-  if((castedType() == dst_type) || (isString() && dst.isString()))
++  if(same_type() || (isString() && dst.isString()))
+   {
+     dst._any = _any;
+   }
+@@ -519,8 +529,9 @@ inline nonstd::expected<T, std::string> Any::tryCast() const
+   {
+     throw std::runtime_error("Any::cast failed because it is empty");
+   }
+-
+-  if(castedType() == typeid(T))
++  if(castedType() == typeid(T) || 
++     (castedType().name() != nullptr && typeid(T).name() != nullptr &&
++      std::string(castedType().name()) == std::string(typeid(T).name())))
+   {
+     return linb::any_cast<T>(_any);
+   }

@@ -1,0 +1,147 @@
+# Maintainer: Felix Lionardo <flionardo@qnx.com>
+pkgname=ros2-jazzy-nav2
+pkgver=20260128
+pkgrel=0
+pkgdesc="ROS 2 Jazzy desktop package"
+url="https://docs.ros.org/en/jazzy/index.html"
+arch="aarch64 x86_64"
+license="Apache-2.0"
+options="!check !tracedeps !fhs"
+
+source="https://github.com/ros-navigation/navigation2/archive/refs/tags/1.3.11.tar.gz
+https://github.com/ros-geographic-info/geographic_info/archive/refs/tags/1.0.6.tar.gz
+https://github.com/ros/bond_core/archive/refs/tags/4.4.0.tar.gz
+https://github.com/BehaviorTree/BehaviorTree.CPP/archive/refs/tags/4.9.0.tar.gz
+https://github.com/ros-perception/vision_opencv/archive/refs/tags/4.1.0.tar.gz
+https://github.com/cra-ros-pkg/robot_localization/archive/refs/tags/3.8.3.tar.gz
+https://github.com/SteveMacenski/slam_toolbox/archive/refs/tags/2.8.4.tar.gz
+https://github.com/ros-navigation/nav2_minimal_turtlebot_simulation/archive/refs/tags/1.0.3.tar.gz
+behaviortree_cpp.patch
+slam_toolbox.patch
+navigation2.patch
+"
+builddir="$srcdir"
+depends="
+	boost 
+	eigen 
+	tinyxml2 
+	liblocale-shim 
+	qnx-fs-notify 
+	qnx-fs-core 
+	qnx-fs-gpt 
+	python3-numpy
+	ceres-solver
+	libzmq
+	graphicsmagick
+	graphicsmagick-c++
+	geographiclib
+	ompl
+	opencv
+	ros2-jazzy
+	ros2-jazzy-control
+	suitesparse-static
+	xsimd
+	sqlite-libs
+	libopencv_aruco
+	libopencv_face
+	libopencv_ml
+	libopencv_shape
+	libopencv_stitching
+	libopencv_superres
+	libopencv_tracking
+	libopencv_videostab
+	libopencv_highgui
+	libopencv_plot
+	libuuid
+	openmp
+"
+makedepends="
+	ros2-jazzy
+	ros2-jazzy-control
+	boost-dev
+	boost-asio-dev
+	tinyxml2-dev
+	eigen-dev
+	qnx-fs-notify-dev
+	qnx-fs-core-dev
+	qnx-fs-gpt-dev
+	liblocale-shim-dev
+	libuuid-dev
+	python3-dev
+	python3-pip
+	python3-numpy-dev
+	cmake
+	ninja
+	xtensor
+	xsimd-dev
+	nanoflann-dev
+	nlohmann-json
+	ceres-solver-dev
+	suitesparse-dev
+	zeromq-dev
+	graphicsmagick-dev
+	geographiclib-dev
+	ompl-dev
+	opencv-dev
+	glog-dev
+	gflags-dev
+	suitesparse-dev
+	openblas-dev
+"
+
+prepare() {
+        cd "$builddir"
+        _apply_qnx_patch() {
+                local _dir="$1"
+                local _patch="$2"
+                git -C "$builddir/$_dir" apply --whitespace=nowarn "$srcdir/$_patch"
+        }
+        _apply_qnx_patch slam_toolbox-2.8.4 slam_toolbox.patch
+        _apply_qnx_patch BehaviorTree.CPP-4.9.0 behaviortree_cpp.patch
+        _apply_qnx_patch navigation2-1.3.11 navigation2.patch
+}
+
+build() {
+        cd "$builddir"
+        export CXXFLAGS="${CXXFLAGS//-fstack-clash-protection/}"
+        export CFLAGS="${CFLAGS//-fstack-clash-protection/}"
+	source /opt/ros/jazzy/setup.bash
+        colcon build --merge-install \
+                --cmake-args \
+                        -G Ninja \
+                        -DBUILD_TESTING=OFF \
+                        -DCMAKE_BUILD_TYPE=Release \
+			-DCMAKE_C_FLAGS="$CFLAGS -fvisibility=default -frtti -DSA_RESTART=0 -Wno-error=old-style-cast -Wno-error=inconsistent-missing-override -Wno-error=overloaded-virtual -Wno-error=ignored-optimization-argument -Wno-error=unknown-warning-option -Wno-error=pessimizing-move -Wno-error=braced-scalar-init" \
+			-DCMAKE_CXX_FLAGS="$CXXFLAGS -fvisibility=default -frtti -DSA_RESTART=0 -Wno-error=old-style-cast -Wno-error=inconsistent-missing-override -Wno-error=overloaded-virtual -Wno-error=ignored-optimization-argument -Wno-error=unknown-warning-option -Wno-error=pessimizing-move -Wno-error=braced-scalar-init" \
+                        -DCMAKE_EXE_LINKER_FLAGS="-lsocket -lfsnotify -lc++ -lc++abi -Wl,-E" \
+                        -DCMAKE_SHARED_LINKER_FLAGS="-lsocket -lfsnotify -lc++ -lc++abi -Wl,-E" \
+                        -DTRACETOOLS_TRACEPOINTS_EXCLUDED=ON \
+                        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+                --packages-skip nav2_rviz_plugins
+}
+
+package() {
+        dest="/opt/ros/jazzy"
+        mkdir -p "$pkgdir"/$dest
+        cp -a "$builddir"/install/. "$pkgdir"/$dest
+
+        # Remove files we don't want in our final package
+        for _f in  COLCON_IGNORE .colcon_install_layout _local_setup_util_ps1.py local_setup.ps1 setup.ps1 _local_setup_util_sh.py local_setup.bash local_setup.bash local_setup.sh local_setup.zsh setup.bash setup.sh setup.zsh; do
+            [[ -f "$pkgdir"/$dest/$_f ]] && rm "$pkgdir"/$dest/$_f
+        done
+}
+
+sha512sums="
+fe7c3c8915bf45a9880f3fb52b0df4ff935f1d60b7b54db9b52c58013727c7520a5fdf5eb0fe78827f20b2c36f9e03f6d927318038aa6ceba528cac1237e5bf7  1.3.11.tar.gz
+c6ee32dce3c6166760c2fde66d3c0e8251fe1f8ac9bfc8e1f6c95c6650b9cd9db89b477b40b09ea66fbae897c25a6ebc95cd99dfe7a7d93d214e275bea8b8e7e  1.0.6.tar.gz
+f9366b0d8be08aac90cdc9621afc7116c35af469686b30e319293a43590afba196bd797b6eda79f9f3ad7a9850f22fdacb72acd111ebbf6fd04f1bc44fd5e0e1  4.4.0.tar.gz
+a1a9a1f2f649c0bfdb2e141445a376f9a325a6102fa647c4b20dad0de7c2a782c265ac0a7addd4bb5a75e16347f6b7d5ce091df265bcd45cc626db237db81ec5  4.9.0.tar.gz
+e3380b143f425af257c928a04abc52ac5e0f0bca74a927d70528dcf74eaeefa51a0c821d429bc8f18887ee713e7feafde9bd0dcbb09f584c66cb7f8dad86edd1  4.1.0.tar.gz
+a414455e3073073c0b7e0fa91236c20bed6432001d5f821df8040960c08d318f9f07c5b3e5127b9559b503c2fc5498114dcaf785d1a399eeab84be8ca4010495  3.8.3.tar.gz
+cc25f1cd75ccc09d8addb77061f63d1ca59d487d7b7f9b28224895907367677b19c39b841a8a51cefb53f8fc165b936fbdfdd34bb0d62196ec94783fd907b8bc  2.8.4.tar.gz
+30cd9ccc4bb3db5f86a9a463a45c87b4073a6e3a27d9694b113898dd502bf0558ffed16816b9f581cc81379f6391714bdd187832d4d3650c7a7763bf059f481e  1.0.3.tar.gz
+9cefa7e4f7e09774b131da5c9827bc54742d072f9774a3976a21e4dd3edb6577ae0155792e6a3cd448fe42abc2973d7b4a0b9c7791f0ca5f8e9d91b44b671d1e  behaviortree_cpp.patch
+659d9a2b3d1acee1a7e3cba0e15f1a49a94ab604ac0ccc65ad762ed6b01d2abc65501c68ce54df51016dfc9d68bf695837a16eea56aeeb016b2a3fe9f211836a  bond_core.patch
+f61fc8c7d878b075e5add9ec9eeb881a2b7bba7eecf7560efddec1f2f872874e6f01bde032d731c0810ef112cc07c542c6491d9f5a2313997636ca7057751300  slam_toolbox.patch
+4fad9f8124f656a2670edf8ba59ec578c11e2f65522b5d25b892d16083a668eed995643131b598718346ee8a625143303dc534cb222700603b6a8b2698410dc3  navigation2.patch
+"
