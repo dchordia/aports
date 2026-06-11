@@ -7,7 +7,7 @@ url="https://github.com/qnx-ports/libusb"
 arch="all"
 license="LGPL-2.1-or-later"
 
-makedepends="autoconf automake libtool pkgconf ninja libc++-dev qnx-libpci-dev"
+makedepends="autoconf automake libtool pkgconf ninja libc++-dev qnx-libpci-dev  qnx-usb-dev"
 depends="libc++ qnx-libpci"
 
 subpackages="$pkgname-dev"
@@ -19,9 +19,9 @@ builddir="$srcdir/libusb-libusb-1.0.23"
 prepare() {
 	default_prepare
 
-	cd "$srcdir/libusb-libusb-1.0.23" || return 1
+	cd "$srcdir/libusb-libusb-1.0.23" 
 
-	./bootstrap.sh || autoreconf -fi || return 1
+	./bootstrap.sh || autoreconf -fi 
 }
 
 options="!tracedeps !check"
@@ -36,7 +36,7 @@ case "$(uname -m)" in
 esac
 
 build() {
-    cd "$builddir" || return 1
+    cd "$builddir" 
 
     export CC=clang
     export CXX=clang++
@@ -60,9 +60,9 @@ build() {
 #Tests cannot be executed as the qnxuser, and the build must not be run as root. Therefore, 
 # test execution is being disabled and verified the functional tests on root user .
 package() {
-    cd "$builddir" || return 1
+    cd "$builddir"
     make DESTDIR="$pkgdir" install
-    cd "$pkgdir/usr/lib" || return 1
+    cd "$pkgdir/usr/lib"
     ln -sf libusb-1.0.so.0.2.0 libusb-1.0.so.0
     ln -sf libusb-1.0.so.0 libusb-1.0.so
 }
