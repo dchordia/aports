@@ -10,13 +10,16 @@ makedepends="
 	cmake
 	libusb-dev
 	qnx-fs-core-dev
+        libc++-dev
+        python3-dev
+        qnx-fs-gpt-dev
 "
-depends="qnx-fs-core"
+depends="qnx-fs-core libc++ libusb qnx-fs-gpt "
 subpackages="$pkgname-dev"
 source="
 	$pkgname-$pkgver.tar.gz::https://github.com/IntelRealSense/librealsense/archive/refs/tags/v$pkgver.tar.gz
 	librealsense.patch
-    qnx.patch
+        qnx.patch
 "
 
 builddir="$srcdir/librealsense-$pkgver"
@@ -24,7 +27,7 @@ builddir="$srcdir/librealsense-$pkgver"
 prepare() {
 	cd "$builddir"
 	patch -p1 < ../librealsense.patch
-    patch -p1 < ../qnx.patch
+        patch -p1 < ../qnx.patch
 }
 
 build() {
@@ -36,14 +39,14 @@ build() {
 
 	cmake -B build -S . \
 		-DFORCE_RSUSB_BACKEND=ON \
-        -DBUILD_PYTHON_BINDINGS=ON \
+                -DBUILD_PYTHON_BINDINGS=ON \
 		-DBUILD_SHARED_LIBS=ON \
 		-DBUILD_UNIT_TESTS=true \
 		-DBUILD_EXAMPLES=OFF \
 		-DBUILD_GRAPHICAL_EXAMPLES=OFF \
 		-DBUILD_TOOLS=OFF \
 		-DCMAKE_C_FLAGS="$CFLAGS -DPLATFORM_POSIX" \
-        -DCMAKE_INSTALL_PREFIX=/usr \
+                -DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_CXX_FLAGS="$CXXFLAGS -DPLATFORM_POSIX"
 
 	cmake --build build
