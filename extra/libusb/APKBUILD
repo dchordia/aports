@@ -8,7 +8,7 @@ arch="all"
 license="LGPL-2.1-or-later"
 
 makedepends="autoconf automake libtool pkgconf ninja libc++-dev qnx-libpci-dev  qnx-usb-dev"
-depends="libc++ qnx-libpci"
+depends="libc++ qnx-libpci gawk"
 
 subpackages="$pkgname-dev"
 
@@ -27,12 +27,12 @@ prepare() {
 options="!tracedeps !check"
 
 case "$(uname -m)" in
-	x86_64)
-		export CHOST=x86_64-pc-nto
-		;;
-	aarch64)
-		export CHOST=aarch64-unknown-nto-qnx7.1.0
-		;;
+        x86_64)
+                export CHOST=x86_64-pc-nto
+                ;;
+        aarch64)
+                export CHOST=aarch64-unknown-nto-qnx8.0.0
+                ;;
 esac
 
 build() {
@@ -44,25 +44,34 @@ build() {
     export CXXFLAGS="$CXXFLAGS -fPIC"
     export LDFLAGS="-L/usr/local/lib"
     export LIBS="-lusbdi -lpci"
-
+    export CFLAGS=$(echo "$CFLAGS" | sed 's/-fstack-clash-protection//g')
+    export CXXFLAGS=$(echo "$CXXFLAGS" | sed 's/-fstack-clash-protection//g')
+    
     ./configure \
-        --host=$CHOST \
-        --build=$CHOST \
-        --prefix=/usr \
-        --enable-shared \
-        --disable-static \
-        CFLAGS="$CFLAGS" \
-        CXXFLAGS="$CXXFLAGS" \
-        LDFLAGS="$LDFLAGS" \
-        LIBS="$LIBS"
+    --host=$CHOST \
+    --build=$CHOST \
+    --prefix=/usr \
+    --enable-shared \
+    --disable-static \
+    --disable-timerfd \
+    CFLAGS="$CFLAGS" \
+    CXXFLAGS="$CXXFLAGS" \
+    LDFLAGS="$LDFLAGS" \
+    LIBS="$LIBS"
 
     make
 }
+
+
 #Tests cannot be executed as the qnxuser, and the build must not be run as root. Therefore, 
 # test execution is being disabled and verified the functional tests on root user .
 package() {
     cd "$builddir"
+
     make DESTDIR="$pkgdir" install
+
+    mkdir -p "$pkgdir/usr/lib/pkgconfig"
+
     cd "$pkgdir/usr/lib"
     ln -sf libusb-1.0.so.0.2.0 libusb-1.0.so.0
     ln -sf libusb-1.0.so.0 libusb-1.0.so
