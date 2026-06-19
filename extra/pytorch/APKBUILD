@@ -1,0 +1,110 @@
+# Maintainer: Deep Chordia <dchordia@blackberry.com>
+pkgname=pytorch
+pkgver=2.3.1
+pkgrel=0
+pkgdesc="Tensors and Dynamic neural networks in Python with strong GPU acceleration"
+url="https://pytorch.org/"
+arch="all"
+license="BSD-3-Clause"
+depends="
+    pthreadpool
+    cpuinfo
+    "
+depends_dev="
+    pthreadpool-dev
+    opencv-dev
+    gflags-dev
+    openblas-dev
+    eigen-dev
+    cpuinfo-dev
+    libc++-dev
+    "
+makedepends="
+    $depends_dev
+    $depends
+    cmake
+    ninja
+    python3-yaml
+    python3-typing-extensions
+    python3-six
+    "
+subpackages="$pkgname-dev"
+source="
+    $pkgname-$pkgver.tar.gz::https://github.com/pytorch/pytorch/releases/download/v$pkgver/pytorch-v$pkgver.tar.gz
+    0006-add-qnx-build.patch
+"
+builddir="$srcdir/$pkgname-v$pkgver"
+
+prepare() {
+    default_prepare
+    patch -d third_party/XNNPACK -p1 < $srcdir/../0001-XNNPACK-qnx-build.patch
+    patch -d third_party/protobuf -p1 < $srcdir/../0002-protobuf-qnx-build.patch
+    patch -d third_party/kineto -p1 < $srcdir/../0003-kineto-qnx-build.patch
+    patch -d third_party/fbgemm -p1 < $srcdir/../0004-fbgemm-qnx-build.patch
+    patch -d third_party/foxi -p1 < $srcdir/../0005-foxi-qnx-build.patch
+}
+
+build() {
+
+_pytorch_build_args=(
+    "-DUSE_ROCM=OFF"
+    "-DUSE_CUDA=OFF"
+    "-DUSE_MAGMA=OFF"
+    "-DUSE_METAL=OFF"
+    "-DUSE_ITT=OFF"
+    "-DUSE_DISTRIBUTED=OFF"
+    "-DUSE_MKLDNN=OFF"
+    "-DUSE_OPENMP=OFF"
+    "-DUSE_GFLAGS=ON"
+    "-DUSE_OPENCV=ON"
+    "-DUSE_BLAS=ON"
+    "-DUSE_SYSTEM_CPUINFO=ON"
+    "-DUSE_SYSTEM_EIGEN_INSTALL=ON"
+    "-DUSE_NNPACK=OFF"
+    "-DUSE_QNNPACK=OFF"
+    "-DUSE_SYSTEM_XNNPACK=OFF"
+    "-DUSE_SYSTEM_PTHREADPOOL=ON"
+    "-DBUILD_TEST=ON"
+    "-DBUILD_MOBILE_TEST=OFF"
+    "-DBUILD_BINARY=OFF"
+    "-DTRACING_BASED=OFF"
+    "-DXNNPACK_ENABLE_ASSEMBLY=OFF"
+    "-DBUILD_CUSTOM_PROTOBUF=ON"
+    "-DBUILD_CAFFE2=ON"
+    "-DBUILD_PYTHON=OFF"
+)
+
+    export CXXFLAGS="$CXXFLAGS \
+        -Wno-error=unused-command-line-argument -Wno-unused-command-line-argument \
+        -Wno-error=nontrivial-memcall -Wno-nontrivial-memcall \
+        -Wno-error=vla-cxx-extension -Wno-vla-cxx-extension \
+        -Wno-error=character-conversion -Wno-character-conversion\
+        -Wno-error=missing-field-initializers -Wno-missing-field-initializers\
+        -Wno-error=thread-safety-analysis -Wno-thread-safety-analysis\
+        -Wno-error=unknown-warning-option \
+        -DEIGEN_DONT_VECTORIZE"
+    export CMAKE_BUILD_PARALLEL_LEVEL=16
+
+    cmake -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DCMAKE_INSTALL_DATADIR=/usr/lib \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+        -DQNX=1 \
+        "${_pytorch_build_args[@]}"
+    cmake --build build
+}
+
+check() {
+    _test_exclude="vec_test_all_types_AVX512|vec_test_all_types_AVX2|module_test|plan_executor_test|bound_shape_inference_test"
+    ctest --test-dir build -E $_test_exclude -j1
+}
+
+package() {
+    DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+fe132251b2bae87b70ba3d95dc32f6a4545970d11893118b0ebe6ca129732e516ef4d6cc4f380b3db9bb2277d1db8ce78a401c40149bb1dfbab76eab9e3992c4  pytorch-2.3.1.tar.gz
+bbf139de43dee54ee80cda8825faafddac5c6b45c616c7b5ddb909dd490176dccced5d0410066dd5daf87bc9ef32c1b9cd9cb9e9fa17e372b79ecb354f83e097  0006-add-qnx-build.patch
+"
