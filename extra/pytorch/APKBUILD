@@ -21,7 +21,6 @@ depends_dev="
     "
 makedepends="
     $depends_dev
-    $depends
     cmake
     ninja
     python3-yaml
