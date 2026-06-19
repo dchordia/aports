@@ -7,8 +7,13 @@ url="https://pytorch.org/"
 arch="all"
 license="BSD-3-Clause"
 depends="
-    pthreadpool
     cpuinfo
+    gflags
+    opencv
+    openblas
+    eigen
+    pthreadpool
+    libc++
     "
 depends_dev="
     pthreadpool-dev
@@ -27,7 +32,10 @@ makedepends="
     python3-typing-extensions
     python3-six
     "
-subpackages="$pkgname-dev"
+subpackages="
+    $pkgname-dev
+    $pkgname-tests:tests
+    "
 source="
     $pkgname-$pkgver.tar.gz::https://github.com/pytorch/pytorch/releases/download/v$pkgver/pytorch-v$pkgver.tar.gz
     0001-XNNPACK-qnx-build_patch
@@ -58,24 +66,24 @@ build() {
         "-DUSE_ITT=OFF"
         "-DUSE_DISTRIBUTED=OFF"
         "-DUSE_MKLDNN=OFF"
-        "-DUSE_OPENMP=OFF"
+        "-DUSE_OPENMP=ON"
+        "-DUSE_NNPACK=OFF"
+        "-DUSE_QNNPACK=OFF"
+        "-DUSE_SYSTEM_XNNPACK=OFF"
         "-DUSE_GFLAGS=ON"
         "-DUSE_OPENCV=ON"
         "-DUSE_BLAS=ON"
         "-DUSE_SYSTEM_CPUINFO=ON"
         "-DUSE_SYSTEM_EIGEN_INSTALL=ON"
-        "-DUSE_NNPACK=OFF"
-        "-DUSE_QNNPACK=OFF"
-        "-DUSE_SYSTEM_XNNPACK=OFF"
         "-DUSE_SYSTEM_PTHREADPOOL=ON"
-        "-DBUILD_TEST=ON"
         "-DBUILD_MOBILE_TEST=OFF"
         "-DBUILD_BINARY=OFF"
         "-DTRACING_BASED=OFF"
-        "-DXNNPACK_ENABLE_ASSEMBLY=OFF"
+        "-DBUILD_PYTHON=OFF"
+        "-DBUILD_TEST=ON"
+        "-DXNNPACK_ENABLE_ASSEMBLY=ON"
         "-DBUILD_CUSTOM_PROTOBUF=ON"
         "-DBUILD_CAFFE2=ON"
-        "-DBUILD_PYTHON=OFF"
     )
 
     export CXXFLAGS="$CXXFLAGS \
@@ -105,6 +113,14 @@ check() {
 
 package() {
     DESTDIR="$pkgdir" cmake --install build
+}
+
+tests() {
+    pkgdesc="Test suite for $pkgname"
+    depends="$pkgname=$pkgver-r$pkgrel"
+
+    amove usr/bin/test_*
+    amove usr/test/*
 }
 
 sha512sums="
