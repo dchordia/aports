@@ -11,7 +11,6 @@ depends="
     gflags
     opencv
     openblas
-    eigen
     pthreadpool
     libc++
     "
@@ -20,7 +19,6 @@ depends_dev="
     opencv-dev
     gflags-dev
     openblas-dev
-    eigen-dev
     cpuinfo-dev
     libc++-dev
     "
@@ -74,7 +72,6 @@ build() {
         "-DUSE_OPENCV=ON"
         "-DUSE_BLAS=ON"
         "-DUSE_SYSTEM_CPUINFO=ON"
-        "-DUSE_SYSTEM_EIGEN_INSTALL=ON"
         "-DUSE_SYSTEM_PTHREADPOOL=ON"
         "-DBUILD_MOBILE_TEST=OFF"
         "-DBUILD_BINARY=OFF"
