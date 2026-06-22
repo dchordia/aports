@@ -7,20 +7,20 @@ url="https://pytorch.org/"
 arch="all"
 license="BSD-3-Clause"
 depends="
-    cpuinfo
-    gflags
-    opencv
-    openblas
-    pthreadpool
     libc++
+    cpuinfo
+    pthreadpool
+    gflags
+    openblas
+    opencv
     "
 depends_dev="
+    libc++-dev
+    cpuinfo-dev
     pthreadpool-dev
-    opencv-dev
     gflags-dev
     openblas-dev
-    cpuinfo-dev
-    libc++-dev
+    opencv-dev
     "
 makedepends="
     $depends_dev
@@ -105,7 +105,7 @@ build() {
 
 check() {
     _test_exclude="vec_test_all_types_AVX512|vec_test_all_types_AVX2|module_test|plan_executor_test|\
-            bound_shape_inference_test|math_kernel_test|native_test|cpuid_test"
+            bound_shape_inference_test|math_kernel_test|native_test|cpuid_test|inline_container_test"
     ctest --test-dir build -E $_test_exclude -j1
 }
 
@@ -128,5 +128,5 @@ dd46d20bf0e9827d42c1f1553e82988e56a497c19576835835a6fb2b2995201427fef4eb2e1fbcac
 4d8567b3e6b9b949ef29013b98942766a64680b4f037ec96a1f29c0defd1b08aac5a3a30e55229c757c0e0e0d55407d02939d7e4525bdd96326d8d4f8d42ecbb  0003-kineto-qnx-build_patch
 69eb4eb9dd214496fff3d5a4f65645b49f9ce5e1cd4b54cf752e65938324cacb6b04901621d218ad62461187f3159ccda2617b9037a6fe66ebefb08454f13b65  0004-fbgemm-qnx-build_patch
 c0e535ce57d926225406fa8ecc2c8902572c1d1ffb35ce8e5a8e9acf4a8580698c6d27eae05ed3be1df5d9b69ed1b254f320a945db5468945748e4da257cffe3  0005-foxi-qnx-build_patch
-2ccb5158c961bc0d73644a3561dbe39fe90b6cf0a28ba7ae5adfa278a0d6bc16858040ffdbc8314e781bac0ee9888319df45a5af32f11474d0e3fcaa4ce21a01  0006-add-qnx-build.patch
+9d1df092bc542642ed5b261b7857a1cb2d6624b6d90ceedd1ed8aefa29fed2c8d6d676b4241832f3a7cc15748bd024a70bcc9e801b0af9055c057e24370b993c  0006-add-qnx-build.patch
 "

@@ -215,19 +215,19 @@ index da17e2da893..c736f04bda3 100644
  #if STRONG_HAS_STD_FORMAT
  template<typename T, typename Tag, typename... M, typename Char>
 diff --git a/caffe2/CMakeLists.txt b/caffe2/CMakeLists.txt
-index a6b6f0f7d1d..518abdc9c99 100644
+index a6b6f0f7d1d..e5c73c2b705 100644
 --- a/caffe2/CMakeLists.txt
 +++ b/caffe2/CMakeLists.txt
-@@ -563,6 +563,8 @@ endif()
- # Enable conditional FP16 arithmetic intrinsics
- if(CPU_AARCH64 AND LINUX)
- set_source_files_properties(${TORCH_ROOT}/aten/src/ATen/native/BlasKernel.cpp PROPERTIES COMPILE_FLAGS "-march=armv8.2-a+fp16")
-+elseif(CPU_AARCH64 AND QNX)
-+set_source_files_properties(${TORCH_ROOT}/aten/src/ATen/native/BlasKernel.cpp PROPERTIES COMPILE_FLAGS "-march=armv8-a+fp16")
+@@ -561,7 +561,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
  endif()
  
+ # Enable conditional FP16 arithmetic intrinsics
+-if(CPU_AARCH64 AND LINUX)
++if(CPU_AARCH64 AND (LINUX OR QNX))
+ set_source_files_properties(${TORCH_ROOT}/aten/src/ATen/native/BlasKernel.cpp PROPERTIES COMPILE_FLAGS "-march=armv8.2-a+fp16")
+ endif()
  
-@@ -1551,6 +1553,10 @@ if(MSVC AND BUILD_SHARED_LIBS)
+@@ -1551,6 +1551,10 @@ if(MSVC AND BUILD_SHARED_LIBS)
    target_compile_options(torch_cpu PRIVATE "-DONNX_BUILD_MAIN_LIB")
  endif()
  
