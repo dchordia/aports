@@ -104,8 +104,8 @@ build() {
 }
 
 check() {
-    _test_exclude="vec_test_all_types_AVX512|vec_test_all_types_AVX2|module_test|plan_executor_test|\
-            bound_shape_inference_test|math_kernel_test|native_test|cpuid_test|inline_container_test"
+    _test_exclude="vec_test_all_types_AVX512|vec_test_all_types_AVX2|module_test|plan_executor_test|"
+    _test_exclude+="inline_container_test|bound_shape_inference_test|math_kernel_test|native_test|cpuid_test"
     ctest --test-dir build -E $_test_exclude -j1
 }
 
