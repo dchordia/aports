@@ -70,11 +70,13 @@ subpackages="
     "
 _googletest_rev=52204f78f94d7512df1f0f3bea1d47437a2c3a58
 
-source="https://github.com/grpc/grpc/archive/v$pkgver/grpc-v$pkgver.tar.gz
+_git_rev=0
+source="$pkgname-$pkgver-r$_git_rev.tar.gz::https://github.com/qnx-ports/grpc/archive/refs/tags/qnx-v$pkgver-r$_git_rev.tar.gz
     googletest-$_googletest_rev.tar.gz::https://github.com/google/googletest/archive/$_googletest_rev.tar.gz
-    qnx-changes.patch
     "
 options="net !check" # sometimes hang indefinitely on builders
+
+builddir="$pkgname-qnx-v$pkgver-r$_git_rev"
 
 prepare() {
     rm -r third_party/googletest
@@ -244,7 +246,6 @@ lib() {
 }
 
 sha512sums="
-6338448d7c0fc78c38480f1fafd7605d031b600a702df3771a9d1b1236da7bf97a93dbdbc2d93d12d395411dc2f2ac57587ad1b697c4b2a5ac56fb8af1184501  grpc-v1.76.0.tar.gz
+9302226c519903907986c5aa53aef6ab34956683a43984079204af1b45ffc6af270f5da9c681c171fd24f4f9fb48225fffe76e27c67a8bb8c4d0a2926ab53a8a  grpc-1.76.0-r0.tar.gz
 a24d71b1f0a4a54e98da9b1fab80a4402f0dff508bc901bf75976ccc3fbe9fb4a022e5be91b96619bec27ddfb047ff44ff4b5b1c42bb7c79e2b1c48c18fd7436  googletest-52204f78f94d7512df1f0f3bea1d47437a2c3a58.tar.gz
-1e75ca0921396a0e784147ca11a45b99b9a959b1ac7ae594578b125061a19152a8f2e9fa4910c9bab1a67c73f83cc5eda72625c2d71f2ae8a89fb674d29152b9  qnx-changes.patch
 "
