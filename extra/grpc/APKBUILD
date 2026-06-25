@@ -76,7 +76,7 @@ source="$pkgname-$pkgver-r$_git_rev.tar.gz::https://github.com/qnx-ports/grpc/ar
     "
 options="net !check" # sometimes hang indefinitely on builders
 
-builddir="$pkgname-qnx-v$pkgver-r$_git_rev"
+builddir="$srcdir/$pkgname-qnx-v$pkgver-r$_git_rev"
 
 prepare() {
     rm -r third_party/googletest
