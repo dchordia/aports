@@ -183,12 +183,12 @@ check() {
 }
 
 package() {
-    DESTDIR="$pkgdir" cmake --install _build
+    DESTDIR="$pkgdir" cmake --install "$builddir"/_build
     # python3 -m installer -d "$pkgdir" .dist/*.whl
     # python3 -m installer -d "$pkgdir" tools/distrib/python/grpcio_tools/.dist/*.whl
 
     cd doc
-    find ./ -type f -print -exec install -Dm644 {} "$pkgdir"/usr/share/doc/grpc/{} \;
+    find $builddir -type f -print -exec install -Dm644 {} "$pkgdir"/usr/share/doc/grpc/{} \;
     rm "$pkgdir"/usr/share/doc/grpc/.gitignore
 
     find "$pkgdir" -type f -name roots.pem -exec \
