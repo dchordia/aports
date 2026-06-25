@@ -111,6 +111,8 @@ check() {
 
 package() {
     DESTDIR="$pkgdir" cmake --install build
+
+    rm "$pkgdir"/usr/bin/protoc*
 }
 
 tests() {
@@ -118,6 +120,7 @@ tests() {
     depends="$pkgname=$pkgver-r$pkgrel"
 
     amove usr/bin/test_*
+    amove usr/bin/tutorial_tensorexpr
     amove usr/test/*
 }
 
