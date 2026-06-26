@@ -126,6 +126,7 @@ build() {
     export CXX=clang++
     export CFLAGS="$CFLAGS -DNDEBUG -O2"
     export CXXFLAGS="$CXXFLAGS -DNDEBUG -O2"
+    export LDFLAGS="$LDFLAGS -lsocket"
     cmake -B _build -G Ninja \
         -DCMAKE_BUILD_TYPE=None \
         -DCMAKE_INSTALL_PREFIX=/usr \
