@@ -1,5 +1,5 @@
-# Alipne-Contributor: Francesco Colista <fcolista@alpinelinux.org>
-# Alipne-Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+# Alpine-Contributor: Francesco Colista <fcolista@alpinelinux.org>
+# Alpine-Maintainer: Francesco Colista <fcolista@alpinelinux.org>
 # Maintainer: Marcin Sochacki <msochacki@qnx.com>
 pkgname=lldpd
 pkgver=1.0.19
