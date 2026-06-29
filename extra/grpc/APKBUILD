@@ -124,8 +124,7 @@ prepare() {
 build() {
     export CC=clang
     export CXX=clang++
-    export CFLAGS="$CFLAGS -DNDEBUG -O2"
-    export CXXFLAGS="$CXXFLAGS -DNDEBUG -O2"
+    export CXXFLAGS="$CXXFLAGS -DNDEBUG -O2 -DGRPC_ENABLE_FORK_SUPPORT=1 -DGRPC_POSIX_FORK_ALLOW_PTHREAD_ATFORK=1"
     export LDFLAGS="$LDFLAGS -lsocket"
     cmake -B _build -G Ninja \
         -DCMAKE_BUILD_TYPE=None \
