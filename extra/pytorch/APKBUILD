@@ -113,6 +113,7 @@ package() {
     DESTDIR="$pkgdir" cmake --install build
 
     rm "$pkgdir"/usr/bin/protoc*
+    rm -r "$pkgdir"/usr/include/pybind11
 }
 
 tests() {
