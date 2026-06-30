@@ -31,7 +31,7 @@ case "$(uname -m)" in
 		export CHOST=x86_64-pc-nto
 		;;
 	aarch64)
-		export CHOST=aarch64-unknown-nto-qnx7.1.0
+		export CHOST=aarch64-unknown-nto-qnx8.0.0
 		;;
 esac
 
