@@ -22,7 +22,7 @@ makedepends="
 depends="
     python3-protobuf
     python3-numpy
-    python3-ml_dtypes
+    python3-ml-dtypes
 "
 subpackages="
     $pkgname-dev
