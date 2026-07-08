@@ -8,8 +8,14 @@ arch="all"
 license="BSD-3-Clause"
 _depname=robin-map
 _depver=4ec1bf19c6a96125ea22062f38c2cf5b958e448e
-depends_dev="python3-dev"
-depends="python3"
+depends_dev="
+  libc++-dev
+  python3-dev
+"
+depends="
+  libc++
+  python3
+"
 makedepends="
     $depends_dev
     cmake
