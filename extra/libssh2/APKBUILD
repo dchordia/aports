@@ -1,0 +1,48 @@
+# Alpine Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+# Maintainer: Narayana Murthy <nnarayanamurthy@qnx.com>
+pkgname=libssh2
+pkgver=1.11.1
+pkgrel=0
+pkgdesc="library for accessing ssh1/ssh2 protocol servers"
+url="https://libssh2.org/"
+arch="all"
+license="BSD-3-Clause"
+makedepends_host="openssl-dev>3 zlib-dev"
+checkdepends="bash"
+subpackages="$pkgname-dbg $pkgname-static $pkgname-dev $pkgname-doc"
+source="https://www.libssh2.org/download/libssh2-$pkgver.tar.gz
+	0001-Add-QNX-Support.patch
+	"
+
+build() {
+    CFLAGS="$CFLAGS -fPIC"\
+    ./configure \
+        --build=$CBUILD \
+        --host=$CHOST \
+        --prefix=/usr \
+        --sysconfdir=/etc \
+        --mandir=/usr/share/man \
+        --infodir=/usr/share/info \
+        --localstatedir=/var \
+        --with-crypto=openssl \
+        --with-libssl-prefix=$CBUILDROOT/ \
+        --disable-docker-tests \
+        --disable-rpath \
+        --disable-examples-build
+    make
+}
+
+check() {
+	# with --disable-docker-tests above only mansyntax.sh and test_simple are
+	# run, other tests require docker and a running sshd
+    make check VERBOSE=1
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+8703636fc28f0b12c8171712f3d605e0466a5bb9ba06e136c3203548fc3408ab07defd71dc801d7009a337e1e02fd60e8933a2a526d5ef0ce53153058d201233  libssh2-1.11.1.tar.gz
+64322c19a6c4e4759732d06b8896c33eccb3a92621c9aacbf95e06a9514181de213d3a863681577f04515785d2e8b163575c6664fb58552a902739424ae42b4b  0001-Add-QNX-Support.patch
+"
