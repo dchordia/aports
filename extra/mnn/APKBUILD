@@ -1,0 +1,47 @@
+# Maintainer: Ramya santoshi <rtimmaraju@qnx.com>
+pkgname=mnn
+pkgver=3.6.0
+pkgrel=0
+pkgdesc="Lightweight neural network inference engine"
+url="https://github.com/qnx-ports/MNN"
+arch="all"
+license="Apache-2.0"
+
+depends=""
+makedepends="
+cmake
+ninja
+"
+
+source="$pkgname-$pkgver.tar.gz::https://github.com/alibaba/MNN/archive/refs/tags/$pkgver.tar.gz"
+
+builddir="$srcdir/MNN-$pkgver"
+
+subpackages="$pkgname-dev"
+
+build() {
+    cmake -B build \
+        -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DMNN_BUILD_SHARED_LIBS=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DMNN_BUILD_TOOLS=OFF \
+        -DMNN_BUILD_CONVERTER=OFF \
+        -DMNN_BUILD_TEST=OFF \
+        -DMNN_BUILD_DEMO=OFF \
+        -DMNN_OPENCL=OFF \
+        -DMNN_VULKAN=OFF \
+        -DMNN_BUILD_DEMO=ON \
+        -DMNN_CUDA=OFF
+
+    cmake --build build
+}
+
+package() {
+    DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+ef0c62a7cadc33a12b2fc4fe4e83abc92c04500c41fb9806649b00b80c661c05724eb77da93e8db5e93115955cbcc1b29183c5b3a98297ceab7fc9ecdf3eb5fe  mnn-3.6.0.tar.gz
+"
