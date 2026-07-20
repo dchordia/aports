@@ -1,0 +1,20 @@
+diff --git a/test/git/test_invocations.py b/test/git/test_invocations.py
+index b14fb95..6e2199c 100644
+--- a/test/git/test_invocations.py
++++ b/test/git/test_invocations.py
+@@ -1,5 +1,5 @@
+ import os, sys, shutil, unittest, tempfile, tarfile, warnings
+-from wheel.bdist_wheel import get_abi_tag, get_platform
++from setuptools.command.bdist_wheel import get_abi_tag, get_platform
+ from packaging.tags import interpreter_name, interpreter_version
+ 
+ sys.path.insert(0, "src")
+@@ -54,7 +54,7 @@ class _Invocations(common.Common):
+         # virtualenv causes DeprecationWarning/ResourceWarning on py3
+         with warnings.catch_warnings():
+             warnings.simplefilter("ignore")
+-            self.python('-m', 'virtualenv', venv_dir, workdir=self.testdir)
++            self.python('-m', 'venv', '--system-site-packages', venv_dir, workdir=self.testdir)
+             self.run_in_venv(venv_dir, venv_dir,
+                              'pip', 'install', '-U',
+                              'pip', 'wheel', 'packaging')
