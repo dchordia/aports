@@ -11,7 +11,7 @@ license="BSD-3-Clause"
 depends="
     python3-dateutil
     python3-numpy
-    tzdata"
+    python3-tzdata"
 makedepends="
     cython
     meson
@@ -26,10 +26,7 @@ makedepends="
 subpackages="$pkgname-tests::noarch"
 source="https://github.com/pandas-dev/pandas/releases/download/v$pkgver/pandas-$pkgver.tar.gz"
 builddir="$srcdir/pandas-$pkgver"
-options="!check"
-
-export CC=clang
-export CXX=clang++
+options="!check" # insufficient and large number of dependencies (hypothesis requires rust); cross-compile testing surfaced many failures
 
 build() {
   gpep517 build-wheel \
