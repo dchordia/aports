@@ -27,7 +27,9 @@ build() {
 
 check() {
     cp "$builddir/build/lib/versioneer.py" .
-    pytest -k "not case_mixin and not test_pyproject" --ignore=test/git/test_invocations.py # omitted ones are problem causing tests
+    python3 -m venv --clear --without-pip --system-site-packages .testenv
+	.testenv/bin/python3 -m installer .dist/*.whl
+	.testenv/bin/python3 -m pytest -k "not case_mixin and not test_pyproject" --ignore=test/git/test_invocations.py # omitted ones are problem causing tests
 }
 
 package() {
