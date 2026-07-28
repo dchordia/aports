@@ -1,0 +1,22 @@
+--- tap-driver.sh_org	2026-07-28 06:37:45.000000000 +0000
++++ tap-driver.sh	2026-07-28 06:42:27.000000000 +0000
+@@ -275,7 +275,8 @@
+   print decorate_result(result) msg
+   # Log the result in the log file too, to help debugging (this is
+   # especially true when said result is a TAP error or "Bail out!").
+-  print result msg | "cat >&3";
++  print result msg >> log_file;
++  fflush(log_file)
+ }
+ 
+ function testsuite_error(error_message)
+@@ -542,7 +543,8 @@
+         $0 = curline
+       }
+     # Copy any input line verbatim into the log file.
+-    print | "cat >&3"
++    print >> log_file
++    fflush(log_file)
+     # Parsing of TAP input should stop after a "Bail out!" directive.
+     if (bailed_out)
+       continue
