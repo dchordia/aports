@@ -11,12 +11,14 @@ options="!check"
 license="LGPL-2.1-or-later"
 depends="
     glib
+    libc++
     qnx-io-sock
     qnx-microkernel
     qnx-gcc-libs
 "
 makedepends="
     cmake
+    libc++-dev
     ninja
     glib-dev
     qnx-io-sock-dev
@@ -48,6 +50,12 @@ build() {
 
 package() {
     DESTDIR="$pkgdir" cmake --install build
+}
+
+dev() {
+    default_dev
+
+    amove usr/lib/lcm
 }
 
 check() {
