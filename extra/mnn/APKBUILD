@@ -7,11 +7,13 @@ url="https://github.com/qnx-ports/MNN"
 arch="all"
 license="Apache-2.0"
 
-depends=""
+depends="libc++"
 makedepends="
 cmake
 ninja
+libc++-dev
 "
+options="!check"
 
 source="$pkgname-$pkgver.tar.gz::https://github.com/alibaba/MNN/archive/refs/tags/$pkgver.tar.gz"
 
