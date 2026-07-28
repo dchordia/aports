@@ -1,0 +1,114 @@
+diff --git a/libkineto/src/ConfigLoader.cpp b/libkineto/src/ConfigLoader.cpp
+index d5ed965..ac0ab49 100644
+--- a/libkineto/src/ConfigLoader.cpp
++++ b/libkineto/src/ConfigLoader.cpp
+@@ -8,7 +8,7 @@
+ 
+ #include "ConfigLoader.h"
+ 
+-#ifdef __linux__
++#if defined(___linux__) || defined(__QNX__)
+ #include <csignal>
+ #endif
+ 
+@@ -28,7 +28,7 @@ using namespace std::chrono;
+ namespace KINETO_NAMESPACE {
+ 
+ constexpr char kConfigFileEnvVar[] = "KINETO_CONFIG";
+-#ifdef __linux__
++#if defined(___linux__) || defined(__QNX__)
+ constexpr char kConfigFile[] = "/etc/libkineto.conf";
+ constexpr char kOnDemandConfigFile[] = "/tmp/libkineto.conf";
+ #else
+@@ -38,7 +38,7 @@ constexpr char kOnDemandConfigFile[] = "libkineto.conf";
+ 
+ constexpr std::chrono::seconds kConfigUpdateIntervalSecs(300);
+ 
+-#ifdef __linux__
++#if defined(___linux__) || defined(__QNX__)
+ static struct sigaction originalUsr2Handler = {};
+ #endif
+ 
+@@ -47,7 +47,7 @@ static struct sigaction originalUsr2Handler = {};
+ // If none is found, default to base config.
+ // Try to not affect existing handlers
+ static bool hasOriginalSignalHandler() {
+-#ifdef __linux__
++#if defined(___linux__) || defined(__QNX__)
+   return originalUsr2Handler.sa_handler != nullptr ||
+       originalUsr2Handler.sa_sigaction != nullptr;
+ #else
+@@ -56,7 +56,7 @@ static bool hasOriginalSignalHandler() {
+ }
+ 
+ static void handle_signal([[maybe_unused]] int signal) {
+-#ifdef __linux__
++#if defined(___linux__) || defined(__QNX__)
+   if (signal == SIGUSR2) {
+     ConfigLoader::instance().handleOnDemandSignal();
+     if (hasOriginalSignalHandler()) {
+@@ -71,7 +71,7 @@ static void handle_signal([[maybe_unused]] int signal) {
+ }
+ 
+ static void setupSignalHandler([[maybe_unused]] bool enableSigUsr2) {
+-#ifdef __linux__
++#if defined(___linux__) || defined(__QNX__)
+   if (enableSigUsr2) {
+     struct sigaction act = {};
+     act.sa_handler = &handle_signal;
+diff --git a/libkineto/src/Logger.cpp b/libkineto/src/Logger.cpp
+index a819149..3a5724e 100644
+--- a/libkineto/src/Logger.cpp
++++ b/libkineto/src/Logger.cpp
+@@ -61,7 +61,7 @@ Logger::Logger(int severity, int line, const char* filePath, int errnum)
+ }
+ 
+ Logger::~Logger() {
+-#ifdef __linux__
++#if defined(__linux__) || defined(__QNX__)
+   if (errnum_ != 0) {
+     thread_local char buf[1024];
+     buf_ << " : " << strerror_r(errnum_, buf, sizeof(buf));
+diff --git a/libkineto/src/ThreadUtil.cpp b/libkineto/src/ThreadUtil.cpp
+index 4371df0..bc5f855 100644
+--- a/libkineto/src/ThreadUtil.cpp
++++ b/libkineto/src/ThreadUtil.cpp
+@@ -10,9 +10,9 @@
+ 
+ #ifndef _WIN32
+ #include <pthread.h>
+-#ifndef _AIX
++#if !defined(_AIX) && !defined(__QNX__)
+ #include <sys/syscall.h>
+-#endif // _AIX
++#endif // _AIX && __QNX__
+ #include <unistd.h>
+ #else // _WIN32
+ #include <codecvt>
+@@ -89,7 +89,7 @@ int32_t systemThreadId(bool cache) {
+     sysTid = static_cast<int32_t>(GetCurrentThreadId());
+ #elif defined __FreeBSD__
+     syscall(SYS_thr_self, &sysTid);
+-#elif defined _AIX
++#elif defined(_AIX) || defined(__QNX__)
+     sysTid = pthread_self();
+ #else
+     sysTid = static_cast<int32_t>(syscall(SYS_gettid));
+@@ -168,7 +168,7 @@ bool setThreadName(const std::string& name) {
+ }
+ 
+ std::string getThreadName() {
+-#ifdef _AIX
++#if defined _AIX
+   return "Unknown";
+ #else
+ #ifndef _WIN32
+@@ -207,7 +207,7 @@ std::string getThreadName() {
+ // Extract process name from /proc/pid/cmdline. This does not have
+ // the 16 character limit that /proc/pid/status and /prod/pid/comm has.
+ std::string processName([[maybe_unused]] int32_t pid) {
+-#ifdef __linux__
++#if defined(__linux__) || defined(__QNX__)
+   FILE* cmdfile = fopen(fmt::format("/proc/{}/cmdline", pid).c_str(), "r");
+   if (cmdfile != nullptr) {
+     char* command = nullptr;

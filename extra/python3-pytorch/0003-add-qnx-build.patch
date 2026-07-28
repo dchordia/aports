@@ -1,0 +1,167 @@
+diff --git a/aten/src/ATen/native/quantized/cpu/qnnpack/CMakeLists.txt b/aten/src/ATen/native/quantized/cpu/qnnpack/CMakeLists.txt
+index 19b7851b3e7..1c153df695d 100644
+--- a/aten/src/ATen/native/quantized/cpu/qnnpack/CMakeLists.txt
++++ b/aten/src/ATen/native/quantized/cpu/qnnpack/CMakeLists.txt
+@@ -60,7 +60,7 @@ endif()
+ 
+ if(NOT CMAKE_SYSTEM_NAME)
+   message(FATAL_ERROR "CMAKE_SYSTEM_NAME not defined")
+-elseif(NOT CMAKE_SYSTEM_NAME MATCHES "^(Darwin|Linux|Android)$")
++elseif(NOT CMAKE_SYSTEM_NAME MATCHES "^(Darwin|Linux|Android|QNX)$")
+   message(FATAL_ERROR "Unrecognized CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}")
+ endif()
+ 
+diff --git a/aten/src/ATen/native/quantized/cpu/qnnpack/src/qnnpack/math.h b/aten/src/ATen/native/quantized/cpu/qnnpack/src/qnnpack/math.h
+index 82423546f9b..a66f93c512d 100644
+--- a/aten/src/ATen/native/quantized/cpu/qnnpack/src/qnnpack/math.h
++++ b/aten/src/ATen/native/quantized/cpu/qnnpack/src/qnnpack/math.h
+@@ -9,7 +9,7 @@
+ #pragma once
+ 
+ #include <stddef.h>
+-#ifdef _MSC_VER
++#if  defined(_MSC_VER) || defined(__QNX__)
+ #undef min
+ #undef max
+ #endif
+diff --git a/c10/test/core/Scalar_test.cpp b/c10/test/core/Scalar_test.cpp
+index d87cc051660..7416ba316cc 100644
+--- a/c10/test/core/Scalar_test.cpp
++++ b/c10/test/core/Scalar_test.cpp
+@@ -48,8 +48,10 @@ TEST(ScalarTest, Equality) {
+   ASSERT_FALSE(Scalar(-1).equal(0xFFFFFFFFFFFFFFFF));
+ }
+ 
++#ifndef __QNX__
+ TEST(ScalarTest, LongsAndLongLongs) {
+   Scalar longOne = 1L;
+   Scalar longlongOne = 1LL;
+   ASSERT_EQ(longOne.toInt(), longlongOne.toInt());
+ }
++#endif
+diff --git a/c10/test/util/exception_test.cpp b/c10/test/util/exception_test.cpp
+index c260e96961a..934e6c2c4e9 100644
+--- a/c10/test/util/exception_test.cpp
++++ b/c10/test/util/exception_test.cpp
+@@ -34,7 +34,7 @@ TEST(ExceptionTest, TORCH_INTERNAL_ASSERT_DEBUG_ONLY) {
+ }
+ 
+ // On these platforms there's no assert
+-#if !defined(__ANDROID__) && !defined(__APPLE__)
++#if !defined(__ANDROID__) && !defined(__APPLE__) && !defined(__QNX__)
+ TEST(ExceptionTest, CUDA_KERNEL_ASSERT) {
+   // This function always throws even in NDEBUG mode
+   ASSERT_DEATH_IF_SUPPORTED({ CUDA_KERNEL_ASSERT(false); }, "Assert");
+diff --git a/cmake/Dependencies.cmake b/cmake/Dependencies.cmake
+index 70c5d3de4cf..92f37ac9a8f 100644
+--- a/cmake/Dependencies.cmake
++++ b/cmake/Dependencies.cmake
+@@ -354,7 +354,7 @@ if(USE_NNPACK OR USE_PYTORCH_QNNPACK OR USE_XNNPACK)
+       set(DISABLE_NNPACK_AND_FAMILY ON)
+     endif()
+   else()
+-    if(NOT IOS AND NOT (CMAKE_SYSTEM_NAME MATCHES "^(Android|Linux|Darwin|Windows)$"))
++    if(NOT IOS AND NOT (CMAKE_SYSTEM_NAME MATCHES "^(Android|Linux|Darwin|Windows|QNX)$"))
+       message(WARNING
+         "Target platform \"${CMAKE_SYSTEM_NAME}\" is not supported in {Q/X}NNPACK. "
+         "Supported platforms are Android, iOS, Linux, and macOS. "
+diff --git a/torch/csrc/DataLoader.cpp b/torch/csrc/DataLoader.cpp
+index 31cec72d8a1..2d1e31e9d20 100644
+--- a/torch/csrc/DataLoader.cpp
++++ b/torch/csrc/DataLoader.cpp
+@@ -56,7 +56,11 @@ static void setSignalHandler(
+     struct sigaction* old_sa_ptr) {
+   struct sigaction sa{};
+   sa.sa_sigaction = handler;
+-  sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_NOCLDSTOP | SA_NODEFER;
++#ifndef SA_RESTART
++   sa.sa_flags = SA_SIGINFO | SA_NOCLDSTOP | SA_NODEFER;
++#else
++   sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_NOCLDSTOP | SA_NODEFER;
++#endif
+   if (sigemptyset(&sa.sa_mask) != 0 ||
+       sigaction(signal, &sa, old_sa_ptr) != 0) {
+     std::ostringstream oss;
+diff --git a/torch/csrc/utils/byte_order.h b/torch/csrc/utils/byte_order.h
+index d586270fbfc..e852338059f 100644
+--- a/torch/csrc/utils/byte_order.h
++++ b/torch/csrc/utils/byte_order.h
+@@ -16,6 +16,11 @@
+ #define thp_bswap16(x) bswap16(x)
+ #define thp_bswap32(x) bswap32(x)
+ #define thp_bswap64(x) bswap64(x)
++#elif defined (__QNX__)
++#include <gulliver.h>
++#define thp_bswap16(x) ENDIAN_SWAP16(x)
++#define thp_bswap32(x) ENDIAN_SWAP32(x)
++#define thp_bswap64(x) ENDIAN_SWAP64(x)
+ #elif defined(__APPLE__)
+ #include <libkern/OSByteOrder.h>
+ #define thp_bswap16(x) OSSwapInt16(x)
+diff --git a/torch/headeronly/macros/Macros.h b/torch/headeronly/macros/Macros.h
+index cef99df3f56..bc71c4b4cd9 100644
+--- a/torch/headeronly/macros/Macros.h
++++ b/torch/headeronly/macros/Macros.h
+@@ -545,6 +545,40 @@ __host__ __device__
+     abort();                     \
+   }
+ #else
++#if defined(__QNX__)
++#define CUDA_KERNEL_ASSERT(cond)                                         \
++  if (C10_UNLIKELY(!(cond))) {                                           \
++    __assert(                                                       \
++        #cond, __FILE__, static_cast<unsigned int>(__LINE__), __func__); \
++  }
++#define CUDA_KERNEL_ASSERT_MSG(cond, msg)                              \
++  if (C10_UNLIKELY(!(cond))) {                                         \
++    __assert(                                                     \
++        msg, __FILE__, static_cast<unsigned int>(__LINE__), __func__); \
++  }
++#define CUDA_KERNEL_ASSERT_PRINTF(cond, msg, ...)                        \
++  if (C10_UNLIKELY(!(cond))) {                                           \
++    printf(                                                            \
++        "[CUDA_KERNEL_ASSERT] " __FILE__ ":" C10_STRINGIZE(            \
++            __LINE__) ": %s: block: [%d,%d,%d], thread: [%d,%d,%d]: "  \
++            "Assertion failed: `" #cond "`: " msg "\n",                \
++        __func__,                                                      \
++        blockIdx.x,                                                    \
++        blockIdx.y,                                                    \
++        blockIdx.z,                                                    \
++        threadIdx.x,                                                   \
++        threadIdx.y,                                                   \
++        threadIdx.z,                                                   \
++        ##__VA_ARGS__); \
++    __assert(                                                       \
++        #cond, __FILE__, static_cast<unsigned int>(__LINE__), __func__); \
++  }
++#define SYCL_KERNEL_ASSERT(cond)                                         \
++  if (C10_UNLIKELY(!(cond))) {                                           \
++    __assert(                                                       \
++        #cond, __FILE__, static_cast<unsigned int>(__LINE__), __func__); \
++  }
++#else
+ #define CUDA_KERNEL_ASSERT(cond)                                         \
+   if (C10_UNLIKELY(!(cond))) {                                           \
+     __assert_fail(                                                       \
+@@ -577,6 +611,7 @@ __host__ __device__
+     __assert_fail(                                                       \
+         #cond, __FILE__, static_cast<unsigned int>(__LINE__), __func__); \
+   }
++#endif // __QNX__
+ #endif //  C10_USE_ROCM_KERNEL_ASSERT && USE_ROCM
+ #endif // __APPLE__
+ 
+diff --git a/torch/lib/libshm/CMakeLists.txt b/torch/lib/libshm/CMakeLists.txt
+index 688e7e79291..80b6bf35713 100644
+--- a/torch/lib/libshm/CMakeLists.txt
++++ b/torch/lib/libshm/CMakeLists.txt
+@@ -66,6 +66,9 @@ else()
+   # we need to link directly to c10 here otherwise we miss symbols
+   target_link_libraries(torch_shm_manager PRIVATE shm c10)
+ endif()
++if(CMAKE_SYSTEM_NAME STREQUAL "QNX")
++  target_link_libraries(torch_shm_manager PRIVATE socket)
++endif()
+ set_target_properties(torch_shm_manager PROPERTIES
+   INSTALL_RPATH "${_rpath_portable_origin}/../lib")
+ 
