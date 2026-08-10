@@ -1,0 +1,70 @@
+# Maintianer: Deep Chordia <dchordia@blackberry.com>
+pkgname=lmbench
+pkgver="1.0.0_git20260603"
+_commit="a33716428dc2e717ce3e7dfce767302583eb8fdc"
+pkgrel=0
+pkgdesc="Micro benchmark suite measuring system latency and bandwidth."
+url="https://github.com/intel/lmbench"
+arch="all"
+license="custom:lmbench"
+depends="$pkgname-tests"
+makedepends="
+    make
+"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-tests:tests"
+source="$pkgname-$pkgver.tar.gz::https://github.com/intel/lmbench/archive/$_commit.tar.gz
+    0001-add-qnx-build.patch
+    "
+builddir="$srcdir/$pkgname-$_commit"
+options="!tracedeps !check" # librpc.so.2 is not part of any .apk, check takes long time (~6-7 hours) and requires custom setups for few tests
+
+build() {
+    export CFLAGS="${CFLAGS} ${FLAGS} -O2 -DRUSAGE -DSYS5 -DNO_RPC -Wno-implicit-function-declaration -Wno-format"
+    export LDFLAGS="${LDFLAGS} -Wl,--build-id=md5"
+    sed -i 's/env CFLAGS=-O/env CFLAGS="$(CFLAGS)"/g' src/Makefile
+
+    make -C src \
+        CFLAGS="${CFLAGS}" \
+        LDFLAGS="${LDFLAGS}" \
+        LDLIBS="-lm -lsocket -l:librpc.so.2"
+}
+
+
+check() {
+    cd scripts
+    export OS=$(./os)
+    printf '\n1\n\n\n\n\n\n\n\n\n\nno\n' | ./config-run
+    time ./results
+}
+
+package() {
+    cd scripts && export OS=$(./os)
+    cd ..
+
+    local _dest="$pkgdir/usr/lmbench"
+
+    mkdir -p "$_dest/bin/$OS"
+    mkdir -p "$_dest/scripts"
+    mkdir -p "$pkgdir/usr/include"
+    mkdir -p "$pkgdir/usr/lib"
+    mkdir -p "$pkgdir/usr/share/man/man8"
+    find bin/$OS -maxdepth 1 -type f -not -name "*.*" -not -name "Makefile" -exec cp -a {} "$_dest/bin/$OS/" \;
+
+    cp -a scripts/* "$_dest/scripts/"
+    cp -a scripts/lmbench "$_dest/bin/$OS/"
+    cp -a src/*.h "$pkgdir/usr/include/"
+    cp -a bin/$OS/lmbench.a "$pkgdir/usr/lib/libmbench.a"
+    cp -a doc/* "$pkgdir/usr/share/man/man8/" 2>/dev/null || true
+}
+
+tests() {
+    pkgdesc="lmbench automated test suite binaries and scripts"
+
+    mkdir -p "$subpkgdir"/usr
+    mv "$pkgdir"/usr/lmbench "$subpkgdir"/usr/
+}
+
+sha512sums="
+3a1799bcc0be31a68a1bc70a588bc335dc5064c972a55651fa847215a5844779d5b829f732e68eb130a5e8c3cc012c89a4b5ceee71801311108063db9504a843  lmbench-1.0.0_git20260603.tar.gz
+fd00928b530697776ea7f9723751561adb9211aa61b0e413014564486de68f5d1298eb09422669649caeef20a3ec876981003e67fd959c0be3c3a0b7f4f70685  0001-add-qnx-build.patch
+"
