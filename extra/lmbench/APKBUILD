@@ -7,8 +7,10 @@ pkgdesc="Micro benchmark suite measuring system latency and bandwidth."
 url="https://github.com/intel/lmbench"
 arch="all"
 license="custom:lmbench"
-depends="$pkgname-tests"
+depends="$pkgname-tests qnx-io-sock"
+depends_dev="qnx-io-sock-dev"
 makedepends="
+    $depends_dev
     make
 "
 subpackages="$pkgname-dev $pkgname-doc $pkgname-tests:tests"
