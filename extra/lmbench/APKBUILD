@@ -36,7 +36,7 @@ check() {
     cd scripts
     export OS=$(./os)
     printf '\n1\n\n\n\n\n\n\n\n\n\nno\n' | ./config-run
-    time ./results
+    ./results
 }
 
 package() {
@@ -68,5 +68,5 @@ tests() {
 
 sha512sums="
 3a1799bcc0be31a68a1bc70a588bc335dc5064c972a55651fa847215a5844779d5b829f732e68eb130a5e8c3cc012c89a4b5ceee71801311108063db9504a843  lmbench-1.0.0_git20260603.tar.gz
-fd00928b530697776ea7f9723751561adb9211aa61b0e413014564486de68f5d1298eb09422669649caeef20a3ec876981003e67fd959c0be3c3a0b7f4f70685  0001-add-qnx-build.patch
+e244349d0c33af4c776ce1dd4e752a38ba5da30e3bbf4b536d9f2cdea5e61d7a1ec10b8db28c21b2eae41b981d36f760790060ff4a85b9968bbad9951f796fd2  0001-add-qnx-build.patch
 "
