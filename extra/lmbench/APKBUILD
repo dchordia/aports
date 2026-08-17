@@ -1,4 +1,4 @@
-# Maintianer: Deep Chordia <dchordia@blackberry.com>
+# Maintianer: Deep Chordia <dchordia@qnx.com>
 pkgname=lmbench
 pkgver="1.0.0_git20260603"
 _commit="a33716428dc2e717ce3e7dfce767302583eb8fdc"
@@ -18,7 +18,7 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/intel/lmbench/archive/$_comm
     0001-add-qnx-build.patch
     "
 builddir="$srcdir/$pkgname-$_commit"
-options="!tracedeps !check" # librpc.so.2 is not part of any .apk, check takes long time (~6-7 hours) and requires custom setups for few tests
+options="!tracedeps !check" # librpc.so.2 is not part of any .apk, check takes long time and requires custom setups for few tests
 
 build() {
     export CFLAGS="${CFLAGS} ${FLAGS} -O2 -DRUSAGE -DSYS5 -DNO_RPC -Wno-implicit-function-declaration -Wno-format"
@@ -49,14 +49,16 @@ package() {
     mkdir -p "$_dest/scripts"
     mkdir -p "$pkgdir/usr/include"
     mkdir -p "$pkgdir/usr/lib"
+    mkdir -p "$pkgdir/usr/share/man/man3"
     mkdir -p "$pkgdir/usr/share/man/man8"
-    find bin/$OS -maxdepth 1 -type f -not -name "*.*" -not -name "Makefile" -exec cp -a {} "$_dest/bin/$OS/" \;
+    find bin/$OS -type f -not -name "*.*" -not -name "Makefile" -exec cp -a {} "$_dest/bin/$OS/" \;
 
     cp -a scripts/* "$_dest/scripts/"
     cp -a scripts/lmbench "$_dest/bin/$OS/"
     cp -a src/*.h "$pkgdir/usr/include/"
     cp -a bin/$OS/lmbench.a "$pkgdir/usr/lib/libmbench.a"
-    cp -a doc/* "$pkgdir/usr/share/man/man8/" 2>/dev/null || true
+    cp -a doc/*.3 "$pkgdir/usr/share/man/man3/"
+    cp -a doc/*.8 "$pkgdir/usr/share/man/man8/"
 }
 
 tests() {
