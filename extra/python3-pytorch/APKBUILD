@@ -1,4 +1,4 @@
-# Maintainer: Deep Chordia <dchordia@blackberry.com>
+# Maintainer: Deep Chordia <dchordia@qnx.com>
 pkgname=pytorch
 pkgver=2.12.1
 pkgrel=0
@@ -22,7 +22,6 @@ depends="
     protobuf
     gflags
     openblas
-    onnx
     $_python3_depends
     "
 depends_dev="
@@ -32,7 +31,6 @@ depends_dev="
     protobuf-dev
     gflags-dev
     openblas-dev
-    onnx-dev
     python3-dev
     python3-numpy-dev
     python3-pybind11-dev
@@ -72,7 +70,8 @@ build() {
         -Wno-error=character-conversion -Wno-character-conversion\
         -Wno-error=missing-field-initializers -Wno-missing-field-initializers\
         -Wno-error=thread-safety-analysis -Wno-thread-safety-analysis\
-        -Wno-error=unknown-warning-option \
+        -Wno-error=unknown-warning-option -Wno-unknown-warning-option \
+        -Wno-error=c2y-extensions -Wno-c2y-extensions \
         -DEIGEN_DONT_VECTORIZE"
 
     export CMAKE_BUILD_TYPE=Release
@@ -90,7 +89,7 @@ build() {
     export USE_NNPACK=OFF
     export USE_QNNPACK=OFF
     export USE_SYSTEM_XNNPACK=OFF
-    export USE_SYSTEM_ONNX=ON
+    export USE_SYSTEM_ONNX=OFF
     export USE_SYSTEM_PYBIND11=ON
     export USE_GFLAGS=ON
     export USE_BLAS=ON
@@ -131,5 +130,5 @@ sha512sums="
 f8112bbd5c2884530b0121dd4cf574e77d1d60b53cca4b5949a951babc348970b0ca7e2bdaf6b17fc871966600f0a08c744bcaf9c098cec24b26fafb0a90f47a  pytorch-2.12.1.tar.gz
 c6459b8ac6c155e69e71fa285a1531bc612295e8a2af2999f862d6803cf687320bd50891e61adc0862a530fdfa3d9b8fc12abb0fe12efb76b6f942d2b942a3c2  0001-XNNPACK-qnx-build_patch
 2283653cb4a92a3151b03ae525b15594bddd8951b1c86c1c22263c5a438018e48fa7286b0935109604efc54697986194494fb77d749aeabf2ac4d64d57773a3a  0002-kineto-qnx-build_patch
-158fe9bf6c53934a5edefb810b4f53f6b7c321623b00a9b0dac1ea784b26f3292de2ebfe8db58b7eb3cdfaab7dccf240fd31c0659b7657c97879746dcf90dbb5  0003-add-qnx-build.patch
+ffde6ae42c48163cda6c6256bd00dc31093690bbc32f6dda03c9d99af0c00aa7b961ce8e2a8a7fd8d652532457f1f6fb8b38ea30191d52ab48e31c658fb128d4  0003-add-qnx-build.patch
 "
