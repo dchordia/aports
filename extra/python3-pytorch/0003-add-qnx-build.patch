@@ -398,12 +398,6 @@ index 2064cea0d58..0c27b163548 100644
  
  target_compile_definitions(test_codegen_unboxing PRIVATE USE_GTEST)
  
-diff --git a/third_party/kineto b/third_party/kineto
---- a/third_party/kineto
-+++ b/third_party/kineto
-@@ -1 +1 @@
--Subproject commit b2103f78d13fde4937af010c0ef8e24313568bc5
-+Subproject commit b2103f78d13fde4937af010c0ef8e24313568bc5-dirty
 diff --git a/torch/csrc/DataLoader.cpp b/torch/csrc/DataLoader.cpp
 index 31cec72d8a1..87a65781f8a 100644
 --- a/torch/csrc/DataLoader.cpp
