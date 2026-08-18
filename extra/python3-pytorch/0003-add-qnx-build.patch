@@ -108,7 +108,7 @@ index 19b7851b3e7..8dc355676f9 100644
    if(IOS)
      set_property(SOURCE ${PYTORCH_QNNPACK_AARCH64_ASM_UKERNELS} APPEND_STRING PROPERTY COMPILE_FLAGS " -arch ${IOS_ARCH} ")
 diff --git a/aten/src/ATen/native/quantized/cpu/qnnpack/src/qnnpack/math.h b/aten/src/ATen/native/quantized/cpu/qnnpack/src/qnnpack/math.h
-index 82423546f9b..36969cc1d2e 100644
+index 82423546f9b..2fe6074aa74 100644
 --- a/aten/src/ATen/native/quantized/cpu/qnnpack/src/qnnpack/math.h
 +++ b/aten/src/ATen/native/quantized/cpu/qnnpack/src/qnnpack/math.h
 @@ -9,7 +9,7 @@
@@ -116,7 +116,7 @@ index 82423546f9b..36969cc1d2e 100644
  
  #include <stddef.h>
 -#ifdef _MSC_VER
-+#ifdef _MSC_VER || __QNX__
++#if defined(_MSC_VER) || defined(__QNX__)
  #undef min
  #undef max
  #endif
