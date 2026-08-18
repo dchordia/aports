@@ -1,13 +1,11 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index d5941243d66..aa1772834b5 100644
+index d5941243d66..fb19e09e6b6 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -27,6 +27,14 @@ endif()
+@@ -27,6 +27,12 @@ endif()
  # ---[ Project and semantic versioning.
  project(Torch CXX C)
  
-+message(STATUS "CMAKE_CXX_COMPILER_ID is ${CMAKE_CXX_COMPILER_ID}")
-+
 +# Enable whole archive for CXX on QNXOS
 +if(CMAKE_SYSTEM_NAME STREQUAL "QNX")
 +set(CMAKE_CXX_LINK_LIBRARY_USING_WHOLE_ARCHIVE "LINKER:--whole-archive,<LINK_ITEM>,--no-whole-archive")
@@ -17,7 +15,7 @@ index d5941243d66..aa1772834b5 100644
  # When built via scikit-build-core, Python_EXECUTABLE is already set.
  # For standalone cmake invocations, find it via find_package.
  find_package(Python COMPONENTS Interpreter REQUIRED)
-@@ -186,7 +194,7 @@ set(CPU_RISCV OFF)
+@@ -186,7 +192,7 @@ set(CPU_RISCV OFF)
  
  if(CMAKE_SYSTEM_PROCESSOR MATCHES "(AMD64|x86_64)")
    set(CPU_INTEL ON)
@@ -26,19 +24,16 @@ index d5941243d66..aa1772834b5 100644
    set(CPU_AARCH64 ON)
  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(ppc64le)")
    set(CPU_POWER ON)
-@@ -915,9 +923,9 @@ include(ExternalProject)
+@@ -915,7 +921,7 @@ include(ExternalProject)
  
  # ---[ Dependencies ---[ FBGEMM doesn't work on x86 32bit and
  # CMAKE_SYSTEM_PROCESSOR thinks its 64bit
 -if(USE_FBGEMM AND NOT CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|aarch64)$")
 +if(USE_FBGEMM AND NOT CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|aarch64|aarch64le)$")
    message(WARNING
--    "x86_64 or aarch64 required for FBGEMM. "
-+    "x86_64 or aarch64/le required for FBGEMM. "
+     "x86_64 or aarch64 required for FBGEMM. "
      "Not compiling with FBGEMM. "
-     "Turn this warning off by USE_FBGEMM=OFF.")
-   set(USE_FBGEMM OFF)
-@@ -1028,7 +1036,7 @@ endif()
+@@ -1028,7 +1034,7 @@ endif()
  
  # Enable sleef on Arm(R) architecture by default (except Android)
  if((NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Android")
@@ -47,16 +42,16 @@ index d5941243d66..aa1772834b5 100644
    string(APPEND CMAKE_CXX_FLAGS " -DAT_BUILD_ARM_VEC256_WITH_SLEEF")
    add_definitions(-DAT_BUILD_ARM_VEC256_WITH_SLEEF)
  endif()
-@@ -1183,7 +1191,7 @@ if(NOT MSVC)
+@@ -1183,7 +1189,7 @@ if(NOT MSVC)
    endif()
    append_cxx_flag_if_supported("-Wno-maybe-uninitialized" CMAKE_CXX_FLAGS)
    append_cxx_flag_if_supported("-fstandalone-debug" CMAKE_CXX_FLAGS_DEBUG)
 -  if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64" AND CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|aarch64le" AND CMAKE_CXX_COMPILER_ID MATCHES "GNU")
++  if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|aarch64le" AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
      if(CMAKE_BUILD_TYPE MATCHES Debug)
        message(Warning "Applying -Og optimization for aarch64 GCC debug build to workaround ICE")
      endif()
-@@ -1196,7 +1204,7 @@ if(NOT MSVC)
+@@ -1196,7 +1202,7 @@ if(NOT MSVC)
    # aarch64 C++ stack unwinding uses frame-pointer chain walking, so frame
    # pointers must be present in all build types.  The cost is negligible on
    # aarch64 (31 GPRs vs x86-64's 16, so dedicating x29 rarely spills).
@@ -65,7 +60,7 @@ index d5941243d66..aa1772834b5 100644
      append_cxx_flag_if_supported("-fno-omit-frame-pointer" CMAKE_CXX_FLAGS)
    endif()
    append_cxx_flag_if_supported("-fno-math-errno" CMAKE_CXX_FLAGS)
-@@ -1296,7 +1304,7 @@ if(ANDROID AND (NOT ANDROID_DEBUG_SYMBOLS))
+@@ -1296,7 +1302,7 @@ if(ANDROID AND (NOT ANDROID_DEBUG_SYMBOLS))
    endif()
  endif()
  
@@ -75,7 +70,7 @@ index d5941243d66..aa1772834b5 100644
  endif()
  
 diff --git a/aten/src/ATen/native/quantized/cpu/qnnpack/CMakeLists.txt b/aten/src/ATen/native/quantized/cpu/qnnpack/CMakeLists.txt
-index 19b7851b3e7..4e53f7e7fd3 100644
+index 19b7851b3e7..8dc355676f9 100644
 --- a/aten/src/ATen/native/quantized/cpu/qnnpack/CMakeLists.txt
 +++ b/aten/src/ATen/native/quantized/cpu/qnnpack/CMakeLists.txt
 @@ -54,13 +54,13 @@ if(NOT CMAKE_SYSTEM_PROCESSOR)
@@ -94,17 +89,26 @@ index 19b7851b3e7..4e53f7e7fd3 100644
    message(FATAL_ERROR "Unrecognized CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}")
  endif()
  
-@@ -331,7 +331,7 @@ if(NOT TARGET clog)
-     "${CONFU_DEPENDENCIES_BINARY_DIR}/clog")
-   # We build static version of clog but a dynamic library may indirectly depend on it
-   set_property(TARGET clog PROPERTY POSITION_INDEPENDENT_CODE ON)
--  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "QCC")
-     target_compile_options(clog PRIVATE "-Wno-unused-result")
+@@ -270,7 +270,7 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^armv[5-8]" OR IOS_ARCH MATCHES "^armv7")
+   list(APPEND PYTORCH_QNNPACK_UKERNELS ${PYTORCH_QNNPACK_ARM_NEON_UKERNELS})
+   list(APPEND PYTORCH_QNNPACK_UKERNELS ${PYTORCH_QNNPACK_AARCH32_ASM_UKERNELS})
+ endif()
+-if(PYTORCH_QNNPACK_TARGET_PROCESSOR MATCHES "^(aarch64|arm64)$" OR IOS_ARCH MATCHES "^arm64.*")
++if(PYTORCH_QNNPACK_TARGET_PROCESSOR MATCHES "^(aarch64|arm64|aarch64le)$" OR IOS_ARCH MATCHES "^arm64.*")
+   list(APPEND PYTORCH_QNNPACK_UKERNELS ${PYTORCH_QNNPACK_ARM_NEON_UKERNELS})
+   list(APPEND PYTORCH_QNNPACK_UKERNELS ${PYTORCH_QNNPACK_AARCH64_ASM_UKERNELS})
+ endif()
+@@ -297,7 +297,7 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^armv[5-8]" OR IOS_ARCH MATCHES "^armv7")
+     set_property(SOURCE ${PYTORCH_QNNPACK_AARCH32_ASM_UKERNELS} APPEND_STRING PROPERTY COMPILE_FLAGS " -arch ${IOS_ARCH} ")
    endif()
  endif()
+-if(PYTORCH_QNNPACK_TARGET_PROCESSOR MATCHES "^(aarch64|arm64)$" OR IOS_ARCH MATCHES "^arm64.*")
++if(PYTORCH_QNNPACK_TARGET_PROCESSOR MATCHES "^(aarch64|arm64|aarch64le)$" OR IOS_ARCH MATCHES "^arm64.*")
+   set_property(SOURCE ${PYTORCH_QNNPACK_ARM_NEON_UKERNELS} APPEND_STRING PROPERTY COMPILE_FLAGS " -O2 ")
+   if(IOS)
+     set_property(SOURCE ${PYTORCH_QNNPACK_AARCH64_ASM_UKERNELS} APPEND_STRING PROPERTY COMPILE_FLAGS " -arch ${IOS_ARCH} ")
 diff --git a/aten/src/ATen/native/quantized/cpu/qnnpack/src/qnnpack/math.h b/aten/src/ATen/native/quantized/cpu/qnnpack/src/qnnpack/math.h
-index 82423546f9b..a66f93c512d 100644
+index 82423546f9b..36969cc1d2e 100644
 --- a/aten/src/ATen/native/quantized/cpu/qnnpack/src/qnnpack/math.h
 +++ b/aten/src/ATen/native/quantized/cpu/qnnpack/src/qnnpack/math.h
 @@ -9,7 +9,7 @@
@@ -112,7 +116,7 @@ index 82423546f9b..a66f93c512d 100644
  
  #include <stddef.h>
 -#ifdef _MSC_VER
-+#if  defined(_MSC_VER) || defined(__QNX__)
++#ifdef _MSC_VER || __QNX__
  #undef min
  #undef max
  #endif
@@ -145,10 +149,10 @@ index c260e96961a..934e6c2c4e9 100644
    // This function always throws even in NDEBUG mode
    ASSERT_DEATH_IF_SUPPORTED({ CUDA_KERNEL_ASSERT(false); }, "Assert");
 diff --git a/caffe2/CMakeLists.txt b/caffe2/CMakeLists.txt
-index a6b6f0f7d1d..e5c73c2b705 100644
+index 171e5446f5e..6cf8cbbe288 100644
 --- a/caffe2/CMakeLists.txt
 +++ b/caffe2/CMakeLists.txt
-@@ -561,7 +561,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
+@@ -483,7 +483,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
  endif()
  
  # Enable conditional FP16 arithmetic intrinsics
@@ -178,6 +182,327 @@ index 70c5d3de4cf..c22951b1b07 100644
        message(WARNING
          "Target architecture \"${CMAKE_SYSTEM_PROCESSOR}\" is not supported in {Q/X}NNPACK. "
          "Supported architectures are x86, x86-64, ARM, and ARM64. "
+diff --git a/test/cpp/lite_interpreter_runtime/CMakeLists.txt b/test/cpp/lite_interpreter_runtime/CMakeLists.txt
+index 5c27dd84f7c..496bb749324 100644
+--- a/test/cpp/lite_interpreter_runtime/CMakeLists.txt
++++ b/test/cpp/lite_interpreter_runtime/CMakeLists.txt
+@@ -7,10 +7,16 @@ set(LITE_INTERPRETER_RUNTIME_TEST_DIR
+   ${TORCH_ROOT}/test/cpp/lite_interpreter_runtime/test_mobile_profiler.cpp
+ )
+ 
+-add_library(backend_with_compiler_runtime SHARED
+-        ${TORCH_ROOT}/test/cpp/jit/test_backend_compiler_lib.cpp
+-        ${TORCH_ROOT}/torch/csrc/jit/backends/backend_interface.cpp
+-        )
++if(QNX)
++  add_library(backend_with_compiler_runtime SHARED
++          ${TORCH_ROOT}/test/cpp/jit/test_backend_compiler_lib.cpp
++          )
++else()
++  add_library(backend_with_compiler_runtime SHARED
++          ${TORCH_ROOT}/test/cpp/jit/test_backend_compiler_lib.cpp
++          ${TORCH_ROOT}/torch/csrc/jit/backends/backend_interface.cpp
++          )
++endif()
+ target_link_libraries(backend_with_compiler_runtime PRIVATE torch)
+ 
+ add_executable(
+diff --git a/test/cpp/lite_interpreter_runtime/test_lite_interpreter_runtime.cpp b/test/cpp/lite_interpreter_runtime/test_lite_interpreter_runtime.cpp
+index b6467b7c5b4..2ebc90a4f59 100644
+--- a/test/cpp/lite_interpreter_runtime/test_lite_interpreter_runtime.cpp
++++ b/test/cpp/lite_interpreter_runtime/test_lite_interpreter_runtime.cpp
+@@ -16,9 +16,14 @@ namespace mobile {
+ 
+ TEST(RunTimeTest, LoadAndForward) {
+   // Load check in model: sequence.ptl
++#if defined(__QNX__)
++  // Don't compile an absolute path when building for a target.
++  auto testModelFile = "sequence.ptl";
++#else
+   std::string filePath(__FILE__);
+   auto testModelFile = filePath.substr(0, filePath.find_last_of("/\\") + 1);
+   testModelFile.append("sequence.ptl");
++#endif
+ 
+   //  sequence.ptl source code:
+   //  class A(torch.nn.Module):
+@@ -53,6 +58,10 @@ TEST(RunTimeTest, LoadAndForward) {
+ }
+ 
+ TEST(RunTimeTest, Delegate) {
++#if defined(__QNX__)
++  // Don't compile an absolute path when building for a target.
++  auto testModelFile = "delegate_test.ptl";
++#else
+   std::string filePath(__FILE__);
+   auto testModelFile = filePath.substr(0, filePath.find_last_of("/\\") + 1);
+   // "delegate_test.ptl" is generated from test/cpp/jit/test_backend.cpp,
+@@ -66,6 +75,7 @@ TEST(RunTimeTest, Delegate) {
+   //        return x + h
+   //  )");
+   testModelFile.append("delegate_test.ptl");
++#endif
+   auto mlm = _load_for_mobile(testModelFile);
+   std::vector<IValue> inputs;
+   inputs.emplace_back(2.0 * at::ones({}));
+@@ -76,6 +86,10 @@ TEST(RunTimeTest, Delegate) {
+ }
+ 
+ TEST(RunTimeTest, DelegateException) {
++#if defined(__QNX__)
++  // Don't compile an absolute path when building for a target.
++  auto testModelFile = "delegated_submodule_with_debug_info.ptl";
++#else
+   std::string filePath(__FILE__);
+   auto testModelFile = filePath.substr(0, filePath.find_last_of("/\\") + 1);
+   /*
+@@ -138,6 +152,7 @@ TEST(RunTimeTest, DelegateException) {
+    *
+    */
+   testModelFile.append("delegated_submodule_with_debug_info.ptl");
++#endif
+   auto mlm = _load_for_mobile(testModelFile);
+   std::vector<IValue> inputs;
+   inputs.emplace_back(torch::rand({2, 4}));
+diff --git a/test/cpp/lite_interpreter_runtime/test_mobile_profiler.cpp b/test/cpp/lite_interpreter_runtime/test_mobile_profiler.cpp
+index 2ebb247bd2c..876b562f37d 100644
+--- a/test/cpp/lite_interpreter_runtime/test_mobile_profiler.cpp
++++ b/test/cpp/lite_interpreter_runtime/test_mobile_profiler.cpp
+@@ -45,15 +45,24 @@ bool checkMetaData(
+ } // namespace
+ 
+ TEST(MobileProfiler, ModuleHierarchy) {
+-  auto testModelFile = torch::testing::getResourcePath(
+-      "test/cpp/lite_interpreter_runtime/to_be_profiled_module.ptl");
++#if defined(__QNX__)
++  // Don't compile an absolute path when building for a target.
++  auto testModelFile = "to_be_profiled_module.ptl";
++#else
++   auto testModelFile = torch::testing::getResourcePath(
++       "test/cpp/lite_interpreter_runtime/to_be_profiled_module.ptl");
++#endif
+ 
+   std::vector<IValue> inputs;
+   inputs.emplace_back(at::rand({64, 64}));
+   inputs.emplace_back(at::rand({64, 64}));
+   std::string trace_file_name("/tmp/test_trace.trace");
+ 
+-  mobile::Module bc = _load_for_mobile(testModelFile.string());
++#if defined(__QNX__)
++  mobile::Module bc = _load_for_mobile(testModelFile);
++#else
++   mobile::Module bc = _load_for_mobile(testModelFile.string());
++#endif
+   {
+     KinetoEdgeCPUProfiler profiler(
+         bc,
+@@ -99,15 +108,24 @@ TEST(MobileProfiler, ModuleHierarchy) {
+ }
+ 
+ TEST(MobileProfiler, Backend) {
+-  auto testModelFile = torch::testing::getResourcePath(
+-      "test/cpp/lite_interpreter_runtime/test_backend_for_profiling.ptl");
++#if defined(__QNX__)
++  // Don't compile an absolute path when building for a target.
++  auto testModelFile = "test_backend_for_profiling.ptl";
++#else
++   auto testModelFile = torch::testing::getResourcePath(
++       "test/cpp/lite_interpreter_runtime/test_backend_for_profiling.ptl");
++#endif
+ 
+   std::vector<IValue> inputs;
+   inputs.emplace_back(at::rand({64, 64}));
+   inputs.emplace_back(at::rand({64, 64}));
+   std::string trace_file_name("/tmp/test_trace_backend.trace");
+ 
+-  mobile::Module bc = _load_for_mobile(testModelFile.string());
++#if defined(__QNX__)
++  mobile::Module bc = _load_for_mobile(testModelFile);
++#else
++   mobile::Module bc = _load_for_mobile(testModelFile.string());
++#endif
+   {
+     KinetoEdgeCPUProfiler profiler(
+         bc,
+@@ -133,15 +151,24 @@ TEST(MobileProfiler, Backend) {
+ }
+ 
+ TEST(MobileProfiler, BackendMemoryEvents) {
+-  auto testModelFile = torch::testing::getResourcePath(
+-      "test/cpp/lite_interpreter_runtime/test_backend_for_profiling.ptl");
++#if defined(__QNX__)
++  // Don't compile an absolute path when building for a target.
++  auto testModelFile = "test_backend_for_profiling.ptl";
++#else
++   auto testModelFile = torch::testing::getResourcePath(
++       "test/cpp/lite_interpreter_runtime/test_backend_for_profiling.ptl");
++#endif
+ 
+   std::vector<IValue> inputs;
+   inputs.emplace_back(at::rand({64, 64}));
+   inputs.emplace_back(at::rand({64, 64}));
+   std::string trace_file_name("/tmp/test_trace_backend_memory.trace");
+ 
+-  mobile::Module bc = _load_for_mobile(testModelFile.string());
++#if defined(__QNX__)
++  mobile::Module bc = _load_for_mobile(testModelFile);
++#else
++   mobile::Module bc = _load_for_mobile(testModelFile.string());
++#endif
+   {
+     mobile::KinetoEdgeCPUProfiler profiler(
+         bc,
+@@ -165,8 +192,13 @@ TEST(MobileProfiler, BackendMemoryEvents) {
+ }
+ 
+ TEST(MobileProfiler, ProfilerEvent) {
+-  auto testModelFile = torch::testing::getResourcePath(
+-      "test/cpp/lite_interpreter_runtime/test_backend_for_profiling.ptl");
++#if defined(__QNX__)
++  // Don't compile an absolute path when building for a target.
++  auto testModelFile = "test_backend_for_profiling.ptl";
++#else
++   auto testModelFile = torch::testing::getResourcePath(
++       "test/cpp/lite_interpreter_runtime/test_backend_for_profiling.ptl");
++#endif
+ 
+   std::vector<IValue> inputs;
+   inputs.emplace_back(at::rand({64, 64}));
+@@ -177,7 +209,11 @@ TEST(MobileProfiler, ProfilerEvent) {
+       torch::profiler::ProfilerPerfEvents.begin(),
+       torch::profiler::ProfilerPerfEvents.end());
+ 
+-  mobile::Module bc = _load_for_mobile(testModelFile.string());
++#if defined(__QNX__)
++  mobile::Module bc = _load_for_mobile(testModelFile);
++#else
++   mobile::Module bc = _load_for_mobile(testModelFile.string());
++#endif
+   {
+     // Bail if something goes wrong here
+     try {
+diff --git a/test/mobile/lightweight_dispatch/CMakeLists.txt b/test/mobile/lightweight_dispatch/CMakeLists.txt
+index 2064cea0d58..0c27b163548 100644
+--- a/test/mobile/lightweight_dispatch/CMakeLists.txt
++++ b/test/mobile/lightweight_dispatch/CMakeLists.txt
+@@ -8,7 +8,11 @@ add_executable(test_codegen_unboxing
+   ${TEST_ROOT}/test_codegen_unboxing.cpp
+ )
+ 
+-target_include_directories(test_codegen_unboxing PRIVATE ${ATen_CPU_INCLUDE})
++if(QNX)
++  target_include_directories(test_codegen_unboxing PRIVATE ${ATen_CPU_INCLUDE} ${TORCH_ROOT}/torch/csrc/api/include)
++else()
++  target_include_directories(test_codegen_unboxing PRIVATE ${ATen_CPU_INCLUDE})
++endif()
+ 
+ target_compile_definitions(test_codegen_unboxing PRIVATE USE_GTEST)
+ 
+diff --git a/third_party/kineto b/third_party/kineto
+--- a/third_party/kineto
++++ b/third_party/kineto
+@@ -1 +1 @@
+-Subproject commit b2103f78d13fde4937af010c0ef8e24313568bc5
++Subproject commit b2103f78d13fde4937af010c0ef8e24313568bc5-dirty
+diff --git a/torch/csrc/DataLoader.cpp b/torch/csrc/DataLoader.cpp
+index 31cec72d8a1..87a65781f8a 100644
+--- a/torch/csrc/DataLoader.cpp
++++ b/torch/csrc/DataLoader.cpp
+@@ -56,7 +56,11 @@ static void setSignalHandler(
+     struct sigaction* old_sa_ptr) {
+   struct sigaction sa{};
+   sa.sa_sigaction = handler;
++#ifndef SA_RESTART
++  sa.sa_flags = SA_SIGINFO | SA_NOCLDSTOP | SA_NODEFER;
++#else
+   sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_NOCLDSTOP | SA_NODEFER;
++#endif
+   if (sigemptyset(&sa.sa_mask) != 0 ||
+       sigaction(signal, &sa, old_sa_ptr) != 0) {
+     std::ostringstream oss;
+diff --git a/torch/csrc/utils/byte_order.h b/torch/csrc/utils/byte_order.h
+index d586270fbfc..b074f4b8db6 100644
+--- a/torch/csrc/utils/byte_order.h
++++ b/torch/csrc/utils/byte_order.h
+@@ -26,6 +26,11 @@
+ #define thp_bswap16(x) bswap_16(x)
+ #define thp_bswap32(x) bswap_32(x)
+ #define thp_bswap64(x) bswap_64(x)
++#elif defined (__QNX__)
++#include <gulliver.h>
++#define thp_bswap16(x) ENDIAN_SWAP16(x)
++#define thp_bswap32(x) ENDIAN_SWAP32(x)
++#define thp_bswap64(x) ENDIAN_SWAP64(x)
+ #elif defined _WIN32 || defined _WIN64
+ #define thp_bswap16(x) _byteswap_ushort(x)
+ #define thp_bswap32(x) _byteswap_ulong(x)
+diff --git a/torch/headeronly/macros/Macros.h b/torch/headeronly/macros/Macros.h
+index cef99df3f56..bc71c4b4cd9 100644
+--- a/torch/headeronly/macros/Macros.h
++++ b/torch/headeronly/macros/Macros.h
+@@ -545,6 +545,40 @@ __host__ __device__
+     abort();                     \
+   }
+ #else
++#if defined(__QNX__)
++#define CUDA_KERNEL_ASSERT(cond)                                         \
++  if (C10_UNLIKELY(!(cond))) {                                           \
++    __assert(                                                       \
++        #cond, __FILE__, static_cast<unsigned int>(__LINE__), __func__); \
++  }
++#define CUDA_KERNEL_ASSERT_MSG(cond, msg)                              \
++  if (C10_UNLIKELY(!(cond))) {                                         \
++    __assert(                                                     \
++        msg, __FILE__, static_cast<unsigned int>(__LINE__), __func__); \
++  }
++#define CUDA_KERNEL_ASSERT_PRINTF(cond, msg, ...)                        \
++  if (C10_UNLIKELY(!(cond))) {                                           \
++    printf(                                                            \
++        "[CUDA_KERNEL_ASSERT] " __FILE__ ":" C10_STRINGIZE(            \
++            __LINE__) ": %s: block: [%d,%d,%d], thread: [%d,%d,%d]: "  \
++            "Assertion failed: `" #cond "`: " msg "\n",                \
++        __func__,                                                      \
++        blockIdx.x,                                                    \
++        blockIdx.y,                                                    \
++        blockIdx.z,                                                    \
++        threadIdx.x,                                                   \
++        threadIdx.y,                                                   \
++        threadIdx.z,                                                   \
++        ##__VA_ARGS__); \
++    __assert(                                                       \
++        #cond, __FILE__, static_cast<unsigned int>(__LINE__), __func__); \
++  }
++#define SYCL_KERNEL_ASSERT(cond)                                         \
++  if (C10_UNLIKELY(!(cond))) {                                           \
++    __assert(                                                       \
++        #cond, __FILE__, static_cast<unsigned int>(__LINE__), __func__); \
++  }
++#else
+ #define CUDA_KERNEL_ASSERT(cond)                                         \
+   if (C10_UNLIKELY(!(cond))) {                                           \
+     __assert_fail(                                                       \
+@@ -577,6 +611,7 @@ __host__ __device__
+     __assert_fail(                                                       \
+         #cond, __FILE__, static_cast<unsigned int>(__LINE__), __func__); \
+   }
++#endif // __QNX__
+ #endif //  C10_USE_ROCM_KERNEL_ASSERT && USE_ROCM
+ #endif // __APPLE__
+ 
+diff --git a/torch/lib/libshm/CMakeLists.txt b/torch/lib/libshm/CMakeLists.txt
+index 688e7e79291..80b6bf35713 100644
+--- a/torch/lib/libshm/CMakeLists.txt
++++ b/torch/lib/libshm/CMakeLists.txt
+@@ -66,6 +66,9 @@ else()
+   # we need to link directly to c10 here otherwise we miss symbols
+   target_link_libraries(torch_shm_manager PRIVATE shm c10)
+ endif()
++if(CMAKE_SYSTEM_NAME STREQUAL "QNX")
++  target_link_libraries(torch_shm_manager PRIVATE socket)
++endif()
+ set_target_properties(torch_shm_manager PROPERTIES
+   INSTALL_RPATH "${_rpath_portable_origin}/../lib")
+ 
 diff --git a/scripts/build_mobile_qnx_arm.sh b/scripts/build_mobile_qnx_arm.sh
 new file mode 100755
 index 0000000000..9d86c3ab35
@@ -322,306 +647,3 @@ index 0000000000..9d86c3ab35
 +echo "Will install headers and libs to $INSTALL_PREFIX for further project usage."
 +cmake --build . --target install "-j${MAX_JOBS}" 2>> log.txt
 +echo "Installation completed, now you can copy the headers/libs from $INSTALL_PREFIX to your project directory."
-diff --git a/test/cpp/lite_interpreter_runtime/CMakeLists.txt b/test/cpp/lite_interpreter_runtime/CMakeLists.txt
-index 6a2e6db6ea..2df57bfeb5 100644
---- a/test/cpp/lite_interpreter_runtime/CMakeLists.txt
-+++ b/test/cpp/lite_interpreter_runtime/CMakeLists.txt
-@@ -7,10 +7,16 @@ set(LITE_INTERPRETER_RUNTIME_TEST_DIR
-   ${TORCH_ROOT}/test/cpp/lite_interpreter_runtime/test_mobile_profiler.cpp
- )
- 
--add_library(backend_with_compiler_runtime SHARED
--        ${TORCH_ROOT}/test/cpp/jit/test_backend_compiler_lib.cpp
--        ${TORCH_ROOT}/torch/csrc/jit/backends/backend_interface.cpp
--        )
-+if(QNX)
-+  add_library(backend_with_compiler_runtime SHARED
-+          ${TORCH_ROOT}/test/cpp/jit/test_backend_compiler_lib.cpp
-+          )
-+else()
-+  add_library(backend_with_compiler_runtime SHARED
-+          ${TORCH_ROOT}/test/cpp/jit/test_backend_compiler_lib.cpp
-+          ${TORCH_ROOT}/torch/csrc/jit/backends/backend_interface.cpp
-+          )
-+endif()
- target_link_libraries(backend_with_compiler_runtime PRIVATE torch)
- 
- add_executable(
-diff --git a/test/cpp/lite_interpreter_runtime/test_lite_interpreter_runtime.cpp b/test/cpp/lite_interpreter_runtime/test_lite_interpreter_runtime.cpp
-index f26cfcb2b5..b45ae3c2dd 100644
---- a/test/cpp/lite_interpreter_runtime/test_lite_interpreter_runtime.cpp
-+++ b/test/cpp/lite_interpreter_runtime/test_lite_interpreter_runtime.cpp
-@@ -16,9 +16,14 @@ namespace mobile {
- 
- TEST(RunTimeTest, LoadAndForward) {
-   // Load check in model: sequence.ptl
-+#if defined(__QNX__)
-+  // Don't compile an absolute path when building for a target.
-+  auto testModelFile = "sequence.ptl";
-+#else
-   std::string filePath(__FILE__);
-   auto testModelFile = filePath.substr(0, filePath.find_last_of("/\\") + 1);
-   testModelFile.append("sequence.ptl");
-+#endif
- 
-   //  sequence.ptl source code:
-   //  class A(torch.nn.Module):
-@@ -53,6 +58,10 @@ TEST(RunTimeTest, LoadAndForward) {
- }
- 
- TEST(RunTimeTest, Delegate) {
-+#if defined(__QNX__)
-+  // Don't compile an absolute path when building for a target.
-+  auto testModelFile = "delegate_test.ptl";
-+#else
-   std::string filePath(__FILE__);
-   auto testModelFile = filePath.substr(0, filePath.find_last_of("/\\") + 1);
-   // "delegate_test.ptl" is generated from test/cpp/jit/test_backend.cpp,
-@@ -66,6 +75,7 @@ TEST(RunTimeTest, Delegate) {
-   //        return x + h
-   //  )");
-   testModelFile.append("delegate_test.ptl");
-+#endif
-   auto mlm = _load_for_mobile(testModelFile);
-   std::vector<IValue> inputs;
-   inputs.emplace_back(2.0 * at::ones({}));
-@@ -76,6 +86,10 @@ TEST(RunTimeTest, Delegate) {
- }
- 
- TEST(RunTimeTest, DelegateException) {
-+#if defined(__QNX__)
-+  // Don't compile an absolute path when building for a target.
-+  auto testModelFile = "delegated_submodule_with_debug_info.ptl";
-+#else
-   std::string filePath(__FILE__);
-   auto testModelFile = filePath.substr(0, filePath.find_last_of("/\\") + 1);
-   /*
-@@ -138,6 +152,7 @@ TEST(RunTimeTest, DelegateException) {
-    *
-    */
-   testModelFile.append("delegated_submodule_with_debug_info.ptl");
-+#endif
-   auto mlm = _load_for_mobile(testModelFile);
-   std::vector<IValue> inputs;
-   inputs.emplace_back(torch::rand({2, 4}));
-diff --git a/test/cpp/lite_interpreter_runtime/test_mobile_profiler.cpp b/test/cpp/lite_interpreter_runtime/test_mobile_profiler.cpp
-index 2ebb247bd2..189f526791 100644
---- a/test/cpp/lite_interpreter_runtime/test_mobile_profiler.cpp
-+++ b/test/cpp/lite_interpreter_runtime/test_mobile_profiler.cpp
-@@ -45,15 +45,24 @@ bool checkMetaData(
- } // namespace
- 
- TEST(MobileProfiler, ModuleHierarchy) {
-+#if defined(__QNX__)
-+  // Don't compile an absolute path when building for a target.
-+  auto testModelFile = "to_be_profiled_module.ptl";
-+#else
-   auto testModelFile = torch::testing::getResourcePath(
-       "test/cpp/lite_interpreter_runtime/to_be_profiled_module.ptl");
-+#endif
- 
-   std::vector<IValue> inputs;
-   inputs.emplace_back(at::rand({64, 64}));
-   inputs.emplace_back(at::rand({64, 64}));
-   std::string trace_file_name("/tmp/test_trace.trace");
- 
-+#if defined(__QNX__)
-+  mobile::Module bc = _load_for_mobile(testModelFile);
-+#else
-   mobile::Module bc = _load_for_mobile(testModelFile.string());
-+#endif
-   {
-     KinetoEdgeCPUProfiler profiler(
-         bc,
-@@ -99,15 +108,24 @@ TEST(MobileProfiler, ModuleHierarchy) {
- }
- 
- TEST(MobileProfiler, Backend) {
-+#if defined(__QNX__)
-+  // Don't compile an absolute path when building for a target.
-+  auto testModelFile = "test_backend_for_profiling.ptl";
-+#else
-   auto testModelFile = torch::testing::getResourcePath(
-       "test/cpp/lite_interpreter_runtime/test_backend_for_profiling.ptl");
-+#endif
- 
-   std::vector<IValue> inputs;
-   inputs.emplace_back(at::rand({64, 64}));
-   inputs.emplace_back(at::rand({64, 64}));
-   std::string trace_file_name("/tmp/test_trace_backend.trace");
- 
-+#if defined(__QNX__)
-+  mobile::Module bc = _load_for_mobile(testModelFile);
-+#else
-   mobile::Module bc = _load_for_mobile(testModelFile.string());
-+#endif
-   {
-     KinetoEdgeCPUProfiler profiler(
-         bc,
-@@ -133,15 +151,24 @@ TEST(MobileProfiler, Backend) {
- }
- 
- TEST(MobileProfiler, BackendMemoryEvents) {
-+#if defined(__QNX__)
-+  // Don't compile an absolute path when building for a target.
-+  auto testModelFile = "test_backend_for_profiling.ptl";
-+#else
-   auto testModelFile = torch::testing::getResourcePath(
-       "test/cpp/lite_interpreter_runtime/test_backend_for_profiling.ptl");
-+#endif
- 
-   std::vector<IValue> inputs;
-   inputs.emplace_back(at::rand({64, 64}));
-   inputs.emplace_back(at::rand({64, 64}));
-   std::string trace_file_name("/tmp/test_trace_backend_memory.trace");
- 
-+#if defined(__QNX__)
-+  mobile::Module bc = _load_for_mobile(testModelFile);
-+#else
-   mobile::Module bc = _load_for_mobile(testModelFile.string());
-+#endif
-   {
-     mobile::KinetoEdgeCPUProfiler profiler(
-         bc,
-@@ -165,8 +192,13 @@ TEST(MobileProfiler, BackendMemoryEvents) {
- }
- 
- TEST(MobileProfiler, ProfilerEvent) {
-+#if defined(__QNX__)
-+  // Don't compile an absolute path when building for a target.
-+  auto testModelFile = "test_backend_for_profiling.ptl";
-+#else
-   auto testModelFile = torch::testing::getResourcePath(
-       "test/cpp/lite_interpreter_runtime/test_backend_for_profiling.ptl");
-+#endif
- 
-   std::vector<IValue> inputs;
-   inputs.emplace_back(at::rand({64, 64}));
-@@ -177,7 +209,11 @@ TEST(MobileProfiler, ProfilerEvent) {
-       torch::profiler::ProfilerPerfEvents.begin(),
-       torch::profiler::ProfilerPerfEvents.end());
- 
-+#if defined(__QNX__)
-+  mobile::Module bc = _load_for_mobile(testModelFile);
-+#else
-   mobile::Module bc = _load_for_mobile(testModelFile.string());
-+#endif
-   {
-     // Bail if something goes wrong here
-     try {
-diff --git a/torch/csrc/DataLoader.cpp b/torch/csrc/DataLoader.cpp
-index 31cec72d8a1..87a65781f8a 100644
---- a/torch/csrc/DataLoader.cpp
-+++ b/torch/csrc/DataLoader.cpp
-@@ -56,7 +56,11 @@ static void setSignalHandler(
-     struct sigaction* old_sa_ptr) {
-   struct sigaction sa{};
-   sa.sa_sigaction = handler;
-+#ifndef SA_RESTART
-+  sa.sa_flags = SA_SIGINFO | SA_NOCLDSTOP | SA_NODEFER;
-+#else
-   sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_NOCLDSTOP | SA_NODEFER;
-+#endif
-   if (sigemptyset(&sa.sa_mask) != 0 ||
-       sigaction(signal, &sa, old_sa_ptr) != 0) {
-     std::ostringstream oss;
-diff --git a/test/mobile/lightweight_dispatch/CMakeLists.txt b/test/mobile/lightweight_dispatch/CMakeLists.txt
-index 5ab3232f6a..b83fc7528f 100644
---- a/test/mobile/lightweight_dispatch/CMakeLists.txt
-+++ b/test/mobile/lightweight_dispatch/CMakeLists.txt
-@@ -8,7 +8,11 @@ add_executable(test_codegen_unboxing
-   ${TEST_ROOT}/test_codegen_unboxing.cpp
- )
- 
--target_include_directories(test_codegen_unboxing PRIVATE ${ATen_CPU_INCLUDE})
-+if(QNX)
-+  target_include_directories(test_codegen_unboxing PRIVATE ${ATen_CPU_INCLUDE} ${TORCH_ROOT}/torch/csrc/api/include)
-+else()
-+  target_include_directories(test_codegen_unboxing PRIVATE ${ATen_CPU_INCLUDE})
-+endif()
- 
- target_compile_definitions(test_codegen_unboxing PRIVATE USE_GTEST)
- 
-diff --git a/torch/csrc/utils/byte_order.h b/torch/csrc/utils/byte_order.h
-index d586270fbfc..e852338059f 100644
---- a/torch/csrc/utils/byte_order.h
-+++ b/torch/csrc/utils/byte_order.h
-@@ -16,6 +16,11 @@
- #define thp_bswap16(x) bswap16(x)
- #define thp_bswap32(x) bswap32(x)
- #define thp_bswap64(x) bswap64(x)
-+#elif defined (__QNX__)
-+#include <gulliver.h>
-+#define thp_bswap16(x) ENDIAN_SWAP16(x)
-+#define thp_bswap32(x) ENDIAN_SWAP32(x)
-+#define thp_bswap64(x) ENDIAN_SWAP64(x)
- #elif defined(__APPLE__)
- #include <libkern/OSByteOrder.h>
- #define thp_bswap16(x) OSSwapInt16(x)
-diff --git a/torch/headeronly/macros/Macros.h b/torch/headeronly/macros/Macros.h
-index cef99df3f56..bc71c4b4cd9 100644
---- a/torch/headeronly/macros/Macros.h
-+++ b/torch/headeronly/macros/Macros.h
-@@ -545,6 +545,40 @@ __host__ __device__
-     abort();                     \
-   }
- #else
-+#if defined(__QNX__)
-+#define CUDA_KERNEL_ASSERT(cond)                                         \
-+  if (C10_UNLIKELY(!(cond))) {                                           \
-+    __assert(                                                       \
-+        #cond, __FILE__, static_cast<unsigned int>(__LINE__), __func__); \
-+  }
-+#define CUDA_KERNEL_ASSERT_MSG(cond, msg)                              \
-+  if (C10_UNLIKELY(!(cond))) {                                         \
-+    __assert(                                                     \
-+        msg, __FILE__, static_cast<unsigned int>(__LINE__), __func__); \
-+  }
-+#define CUDA_KERNEL_ASSERT_PRINTF(cond, msg, ...)                        \
-+  if (C10_UNLIKELY(!(cond))) {                                           \
-+    printf(                                                            \
-+        "[CUDA_KERNEL_ASSERT] " __FILE__ ":" C10_STRINGIZE(            \
-+            __LINE__) ": %s: block: [%d,%d,%d], thread: [%d,%d,%d]: "  \
-+            "Assertion failed: `" #cond "`: " msg "\n",                \
-+        __func__,                                                      \
-+        blockIdx.x,                                                    \
-+        blockIdx.y,                                                    \
-+        blockIdx.z,                                                    \
-+        threadIdx.x,                                                   \
-+        threadIdx.y,                                                   \
-+        threadIdx.z,                                                   \
-+        ##__VA_ARGS__); \
-+    __assert(                                                       \
-+        #cond, __FILE__, static_cast<unsigned int>(__LINE__), __func__); \
-+  }
-+#define SYCL_KERNEL_ASSERT(cond)                                         \
-+  if (C10_UNLIKELY(!(cond))) {                                           \
-+    __assert(                                                       \
-+        #cond, __FILE__, static_cast<unsigned int>(__LINE__), __func__); \
-+  }
-+#else
- #define CUDA_KERNEL_ASSERT(cond)                                         \
-   if (C10_UNLIKELY(!(cond))) {                                           \
-     __assert_fail(                                                       \
-@@ -577,6 +611,7 @@ __host__ __device__
-     __assert_fail(                                                       \
-         #cond, __FILE__, static_cast<unsigned int>(__LINE__), __func__); \
-   }
-+#endif // __QNX__
- #endif //  C10_USE_ROCM_KERNEL_ASSERT && USE_ROCM
- #endif // __APPLE__
- 
-diff --git a/torch/lib/libshm/CMakeLists.txt b/torch/lib/libshm/CMakeLists.txt
-index 688e7e79291..80b6bf35713 100644
---- a/torch/lib/libshm/CMakeLists.txt
-+++ b/torch/lib/libshm/CMakeLists.txt
-@@ -66,6 +66,9 @@ else()
-   # we need to link directly to c10 here otherwise we miss symbols
-   target_link_libraries(torch_shm_manager PRIVATE shm c10)
- endif()
-+if(CMAKE_SYSTEM_NAME STREQUAL "QNX")
-+  target_link_libraries(torch_shm_manager PRIVATE socket)
-+endif()
- set_target_properties(torch_shm_manager PROPERTIES
-   INSTALL_RPATH "${_rpath_portable_origin}/../lib")
- 
