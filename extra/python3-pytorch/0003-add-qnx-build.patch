@@ -510,12 +510,12 @@ index 2ebb247bd2..189f526791 100644
      // Bail if something goes wrong here
      try {
 diff --git a/torch/csrc/DataLoader.cpp b/torch/csrc/DataLoader.cpp
-index a0c668043b0..0a95b96a4d2 100644
+index 31cec72d8a1..87a65781f8a 100644
 --- a/torch/csrc/DataLoader.cpp
 +++ b/torch/csrc/DataLoader.cpp
-@@ -56,7 +56,11 @@ static inline void setSignalHandler(
+@@ -56,7 +56,11 @@ static void setSignalHandler(
      struct sigaction* old_sa_ptr) {
-   struct sigaction sa {};
+   struct sigaction sa{};
    sa.sa_sigaction = handler;
 +#ifndef SA_RESTART
 +  sa.sa_flags = SA_SIGINFO | SA_NOCLDSTOP | SA_NODEFER;
