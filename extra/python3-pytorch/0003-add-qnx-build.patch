@@ -415,21 +415,21 @@ index 31cec72d8a1..87a65781f8a 100644
        sigaction(signal, &sa, old_sa_ptr) != 0) {
      std::ostringstream oss;
 diff --git a/torch/csrc/utils/byte_order.h b/torch/csrc/utils/byte_order.h
-index d586270fbfc..b074f4b8db6 100644
+index d586270fbfc..1ce751f1af6 100644
 --- a/torch/csrc/utils/byte_order.h
 +++ b/torch/csrc/utils/byte_order.h
-@@ -26,6 +26,11 @@
- #define thp_bswap16(x) bswap_16(x)
- #define thp_bswap32(x) bswap_32(x)
- #define thp_bswap64(x) bswap_64(x)
-+#elif defined (__QNX__)
+@@ -21,6 +21,11 @@
+ #define thp_bswap16(x) OSSwapInt16(x)
+ #define thp_bswap32(x) OSSwapInt32(x)
+ #define thp_bswap64(x) OSSwapInt64(x)
++#elif defined(__QNX__)
 +#include <gulliver.h>
-+#define thp_bswap16(x) ENDIAN_SWAP16(x)
-+#define thp_bswap32(x) ENDIAN_SWAP32(x)
-+#define thp_bswap64(x) ENDIAN_SWAP64(x)
- #elif defined _WIN32 || defined _WIN64
- #define thp_bswap16(x) _byteswap_ushort(x)
- #define thp_bswap32(x) _byteswap_ulong(x)
++#define thp_bswap16(x) __builtin_bswap16(x)
++#define thp_bswap32(x) __builtin_bswap32(x)
++#define thp_bswap64(x) __builtin_bswap64(x)
+ #elif defined(__GNUC__) && !defined(__MINGW32__)
+ #include <byteswap.h>
+ #define thp_bswap16(x) bswap_16(x)
 diff --git a/torch/headeronly/macros/Macros.h b/torch/headeronly/macros/Macros.h
 index cef99df3f56..bc71c4b4cd9 100644
 --- a/torch/headeronly/macros/Macros.h
