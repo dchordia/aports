@@ -176,6 +176,46 @@ index 9eb64ca..8edd70d 100644
  
  void lmbench_usage(int argc, char *argv[], char* usage);
  
+diff --git a/src/bw_mem64a.c b/src/bw_mem64a.c
+index fb1d921..67b536f 100644
+--- a/src/bw_mem64a.c
++++ b/src/bw_mem64a.c
+@@ -537,7 +537,7 @@ frd_sse(iter_t iterations, void *cookie)
+ 			DOIT_32(0, 16)
+ 			:
+ 			: "r" (p)
+-			: "q0", "x1", "memory");
++			: "v0", "x1", "memory");
+ #else
+ #define	DOIT(i)	val = p[i];
+ 		DOIT_64(0, 1)
+@@ -630,7 +630,7 @@ fwr_sse(iter_t iterations, void *cookie)
+ 			DOIT_32(0, 16)
+ 			:
+ 			: "r" (p)
+-			: "q0", "x1", "memory");
++			: "v0", "x1", "memory");
+ #else
+ #define	DOIT(i)	p[i] = 1;
+ 		DOIT_64(0, 1)
+@@ -720,7 +720,7 @@ frd_avx(iter_t iterations, void *cookie)
+ 			DOIT_16(0, 32)
+ 			:
+ 			: "r" (p)
+-			: "q0", "q1", "memory");
++			: "v0", "v1", "memory");
+ #else
+ #define	DOIT(i)	val = p[i];
+ 		DOIT_64(0, 1)
+@@ -758,7 +758,7 @@ fwr_avx(iter_t iterations, void *cookie)
+ 			DOIT_16(0, 32)
+ 			:
+ 			: "r" (p)
+-			: "q0", "q1", "memory");
++			: "v0", "v1", "memory");
+ #else
+ #define	DOIT(i)	p[i] = 1;
+ 		DOIT_64(0, 1)
 diff --git a/src/bw_mem64d.c b/src/bw_mem64d.c
 index 9dede04..562b9a5 100644
 --- a/src/bw_mem64d.c
