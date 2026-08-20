@@ -21,7 +21,7 @@ builddir="$srcdir/$pkgname-$_commit"
 options="!check" # check takes long time and requires custom setups for few tests
 
 build() {
-    export CFLAGS="${CFLAGS} ${FLAGS} -O2 -DRUSAGE -DSYS5 -DNO_RPC -Wno-implicit-function-declaration -Wno-format"
+    export CFLAGS="${CFLAGS} ${FLAGS} -O2 -DRUSAGE -DSYS5 -DNO_RPC -Wno-format"
     export LDFLAGS="${LDFLAGS} -Wl,--build-id=md5"
     sed -i 's/env CFLAGS=-O/env CFLAGS="$(CFLAGS)"/g' src/Makefile
 
