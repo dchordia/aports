@@ -3,16 +3,23 @@
 # Maintainer: Deep Chordia <dchordia@blackberry.com>
 pkgname=aws-c-cal
 pkgver=0.9.13
-pkgrel=0
+pkgrel=1
 pkgdesc="Aws Crypto Abstraction Layer: Cross-Platform, C99 wrapper for cryptography primitives."
 url="https://github.com/awslabs/aws-c-cal"
 arch="all"
 license="Apache-2.0"
-makedepends="
-    cmake
-    ninja
+depends="
+    aws-c-common
+    openssl
+    "
+depends_dev="
     aws-c-common-dev
     openssl-dev
+    "
+makedepends="
+    $depends_dev
+    cmake
+    ninja
     "
 subpackages="$pkgname-dev"
 source="$pkgname-$pkgver.tar.gz::https://github.com/awslabs/aws-c-cal/archive/refs/tags/v$pkgver.tar.gz"
