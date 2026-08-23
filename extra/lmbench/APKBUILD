@@ -1,12 +1,12 @@
 # Maintianer: Deep Chordia <dchordia@qnx.com>
 pkgname=lmbench
 pkgver="1.0.0_git20260603"
-_commit="a33716428dc2e717ce3e7dfce767302583eb8fdc"
+_commit="b4055121d14ca67ddb5a4242215c2dd48406ca35"
 pkgrel=0
 pkgdesc="Micro benchmark suite measuring system latency and bandwidth."
 url="https://github.com/intel/lmbench"
 arch="all"
-license="custom:lmbench"
+license="LicenseRef-lmbench"
 depends="$pkgname-tests qnx-io-sock qnx-fs-core"
 depends_dev="qnx-io-sock-dev qnx-fs-core-dev"
 makedepends="
@@ -14,9 +14,7 @@ makedepends="
     make
 "
 subpackages="$pkgname-dev $pkgname-doc $pkgname-tests:tests"
-source="$pkgname-$pkgver.tar.gz::https://github.com/intel/lmbench/archive/$_commit.tar.gz
-    0001-add-qnx-build.patch
-    "
+source="$pkgname-$pkgver.tar.gz::https://github.com/qnx-ports/lmbench/archive/$_commit.tar.gz"
 builddir="$srcdir/$pkgname-$_commit"
 options="!check" # check takes long time and requires custom setups for few tests
 
@@ -70,5 +68,4 @@ tests() {
 
 sha512sums="
 3a1799bcc0be31a68a1bc70a588bc335dc5064c972a55651fa847215a5844779d5b829f732e68eb130a5e8c3cc012c89a4b5ceee71801311108063db9504a843  lmbench-1.0.0_git20260603.tar.gz
-f8e3b766afdf2dcfc5ab2a7ada33989ad33c7f1650c68abcef2639aab058d307e21d4d37efda19e8d41f695e0a7461f483464c5d1374327adc15fe948c3e7b14  0001-add-qnx-build.patch
 "
