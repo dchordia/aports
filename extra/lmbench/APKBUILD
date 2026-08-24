@@ -29,7 +29,6 @@ build() {
         LDLIBS="-lm -lsocket"
 }
 
-
 check() {
     cd scripts
     export OS=$(./os)
