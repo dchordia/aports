@@ -1,7 +1,7 @@
 # Maintianer: Deep Chordia <dchordia@qnx.com>
 pkgname=lmbench
 pkgver="1.0.0_git20260603"
-_commit="b4055121d14ca67ddb5a4242215c2dd48406ca35"
+_commit="c879c8e6b0de10619f534f90b53739777f8f0191"
 pkgrel=0
 pkgdesc="Micro benchmark suite measuring system latency and bandwidth."
 url="https://github.com/intel/lmbench"
@@ -67,5 +67,5 @@ tests() {
 }
 
 sha512sums="
-e000db960ab371fe123659ffa02e912e347eedbc7409ca8aceaa5d4ac46fef2e236134040e26de1eeb34f5c966b0beabaf36be762f88fbd478b6c69ebc71881a  lmbench-1.0.0_git20260603.tar.gz
+dba30d470f8c20710674e97522d621137c0a7a288021df6b6b3dcef268015e06d018c5e683b2e3b6ea9869d82d9e862d8429737e4a892c59f7f497ee62ed46b0  lmbench-1.0.0_git20260603.tar.gz
 "
