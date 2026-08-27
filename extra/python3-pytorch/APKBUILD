@@ -24,6 +24,10 @@ _cutlass_jwfromm_commit="a54461186bc30c39bf89bc433f89198892ad9e5f"
 _nlohmann_json_commit="9cca280a4d0ccf0c08f47a99aa71d1b0e52f8d03"
 _dynolog_commit="d2ffe0a4e3acace628db49974246b66fc3e85fb1"
 _fmt_kineto_commit="40626af88bd7df9a5fb80be7b25ac85b122d6c21"
+_mimalloc_commit="048d969a1c5ee2fb89c226298f41ea38445546ef"
+_kleidiai_commit="d7770c89632329a9914ef1a90289917597639cbe"
+_httplib_commit="4d7c9a788de136071ccf0dd4e96239151e2adadb"
+_concurrentqueue_commit="14a0f0008cb09db01d334a9276a23b5b6d6932fe"
 _flatbuffers_version="24.12.23"
 _python3_depends="
     python3
@@ -90,6 +94,10 @@ source="
     nlohmann-$_nlohmann_json_commit.tar.gz::https://github.com/nlohmann/json/archive/$_nlohmann_json_commit.tar.gz
     dynolog-$_dynolog_commit.tar.gz::https://github.com/facebookincubator/dynolog/archive/$_dynolog_commit.tar.gz
     fmt-$_fmt_kineto_commit.tar.gz::https://github.com/fmtlib/fmt/archive/$_fmt_kineto_commit.tar.gz
+    mimalloc-$_mimalloc_commit.tar.gz::https://github.com/microsoft/mimalloc/archive/$_mimalloc_commit.tar.gz
+    kleidiai-$_kleidiai_commit.tar.gz::https://github.com/ARM-software/kleidiai/archive/$_kleidiai_commit.tar.gz
+    cpp-httplib-$_httplib_commit.tar.gz::https://github.com/yhirose/cpp-httplib/archive/$_httplib_commit.tar.gz
+    concurrentqueue-$_concurrentqueue_commit.tar.gz::https://github.com/cameron314/concurrentqueue/archive/$_concurrentqueue_commit.tar.gz
     flatbuffers-$_flatbuffers_version.tar.gz::https://github.com/google/flatbuffers/archive/v$_flatbuffers_version.tar.gz
 "
 builddir="$srcdir/$pkgname-qnx-v$pkgver"
@@ -97,29 +105,33 @@ builddir="$srcdir/$pkgname-qnx-v$pkgver"
 prepare() {
     default_prepare
 
-    rm -rf $builddir/third_party/FP16 && mv "$srcdir"/FP16-$_FP16_commit $builddir/third_party/FP16
-    rm -rf $builddir/third_party/FXdiv && mv "$srcdir"/FXdiv-$_FXdiv_commit $builddir/third_party/FXdiv
-    rm -rf $builddir/third_party/NVTX && mv "$srcdir"/NVTX-$_NVTX_commit $builddir/third_party/NVTX
-    rm -rf $builddir/third_party/XNNPACK && mv "$srcdir"/XNNPACK-$_XNNPACK_commit $builddir/third_party/XNNPACK
-    rm -rf $builddir/third_party/cutlass && mv "$srcdir"/cutlass-$_cutlass_commit $builddir/third_party/cutlass
-    rm -rf $builddir/third_party/fbgemm && mv "$srcdir"/FBGEMM-$_fbgemm_commit $builddir/third_party/fbgemm
-    rm -rf $builddir/third_party/fmt && mv "$srcdir"/fmt-$_fmt_commit $builddir/third_party/fmt
-    rm -rf $builddir/third_party/googletest && mv "$srcdir"/googletest-$_googletest_commit $builddir/third_party/googletest
-    rm -rf $builddir/third_party/kineto && mv "$srcdir"/kineto-$_kineto_commit $builddir/third_party/kineto
-    rm -rf $builddir/third_party/nlohmann && mv "$srcdir"/json-$_nlohmann_commit $builddir/third_party/nlohmann
-    rm -rf $builddir/third_party/pocketfft && mv "$srcdir"/pocketfft-$_pocketfft_commit $builddir/third_party/pocketfft
-    rm -rf $builddir/third_party/psimd && mv "$srcdir"/psimd-$_psimd_commit $builddir/third_party/psimd
-    rm -rf $builddir/third_party/sleef && mv "$srcdir"/sleef-$_sleef_commit $builddir/third_party/sleef
-    rm -rf $builddir/third_party/flatbuffers && mv "$srcdir"/flatbuffers-$_flatbuffers_version $builddir/third_party/flatbuffers
+    rm -rf third_party/FP16 && mv "$srcdir"/FP16-$_FP16_commit third_party/FP16
+    rm -rf third_party/FXdiv && mv "$srcdir"/FXdiv-$_FXdiv_commit third_party/FXdiv
+    rm -rf third_party/NVTX && mv "$srcdir"/NVTX-$_NVTX_commit third_party/NVTX
+    rm -rf third_party/XNNPACK && mv "$srcdir"/XNNPACK-$_XNNPACK_commit third_party/XNNPACK
+    rm -rf third_party/cutlass && mv "$srcdir"/cutlass-$_cutlass_commit third_party/cutlass
+    rm -rf third_party/fbgemm && mv "$srcdir"/FBGEMM-$_fbgemm_commit third_party/fbgemm
+    rm -rf third_party/fmt && mv "$srcdir"/fmt-$_fmt_commit third_party/fmt
+    rm -rf third_party/googletest && mv "$srcdir"/googletest-$_googletest_commit third_party/googletest
+    rm -rf third_party/kineto && mv "$srcdir"/kineto-$_kineto_commit third_party/kineto
+    rm -rf third_party/nlohmann && mv "$srcdir"/json-$_nlohmann_commit third_party/nlohmann
+    rm -rf third_party/pocketfft && mv "$srcdir"/pocketfft-$_pocketfft_commit third_party/pocketfft
+    rm -rf third_party/psimd && mv "$srcdir"/psimd-$_psimd_commit third_party/psimd
+    rm -rf third_party/sleef && mv "$srcdir"/sleef-$_sleef_commit third_party/sleef
+    rm -rf third_party/mimalloc && mv "$srcdir"/mimalloc-$_mimalloc_commit third_party/mimalloc
+    rm -rf third_party/kleidiai && mv "$srcdir"/kleidiai-$_kleidiai_commit third_party/kleidiai
+    rm -rf third_party/cpp-httplib && mv "$srcdir"/cpp-httplib-$_httplib_commit third_party/cpp-httplib
+    rm -rf third_party/concurrentqueue && mv "$srcdir"/concurrentqueue-$_concurrentqueue_commit third_party/concurrentqueue
+    rm -rf third_party/flatbuffers && mv "$srcdir"/flatbuffers-$_flatbuffers_version third_party/flatbuffers
 
-    rm -rf $builddir/third_party/fbgemm/external/asmjit && mv "$srcdir"/asmjit-$_asmjit_commit $builddir/third_party/fbgemm/external/asmjit
-    rm -rf $builddir/third_party/fbgemm/external/cutlass && mv "$srcdir"/cutlass-$_cutlass_jwfromm_commit $builddir/third_party/fbgemm/external/cutlass
-    rm -rf $builddir/third_party/fbgemm/external/json && mv "$srcdir"/json-$_nlohmann_json_commit $builddir/third_party/fbgemm/external/json
-    rm -rf $builddir/third_party/fbgemm/external/googletest && cp -r $builddir/third_party/googletest $builddir/third_party/fbgemm/external/googletest
+    rm -rf third_party/fbgemm/external/asmjit && mv "$srcdir"/asmjit-$_asmjit_commit third_party/fbgemm/external/asmjit
+    rm -rf third_party/fbgemm/external/cutlass && mv "$srcdir"/cutlass-$_cutlass_jwfromm_commit third_party/fbgemm/external/cutlass
+    rm -rf third_party/fbgemm/external/json && mv "$srcdir"/json-$_nlohmann_json_commit third_party/fbgemm/external/json
+    rm -rf third_party/fbgemm/external/googletest && cp -r third_party/googletest third_party/fbgemm/external/googletest
 
-    rm -rf $builddir/third_party/kineto/libkineto/third_party/dynolog && mv "$srcdir"/dynolog-$_dynolog_commit $builddir/third_party/kineto/libkineto/third_party/dynolog
-    rm -rf $builddir/third_party/kineto/libkineto/third_party/fmt && mv "$srcdir"/fmt-$_fmt_kineto_commit $builddir/third_party/kineto/libkineto/third_party/fmt
-    rm -rf $builddir/third_party/kineto/libkineto/third_party/googletest && cp -r $builddir/third_party/googletest $builddir/third_party/kineto/libkineto/third_party/googletest
+    rm -rf third_party/kineto/libkineto/third_party/dynolog && mv "$srcdir"/dynolog-$_dynolog_commit third_party/kineto/libkineto/third_party/dynolog
+    rm -rf third_party/kineto/libkineto/third_party/fmt && mv "$srcdir"/fmt-$_fmt_kineto_commit third_party/kineto/libkineto/third_party/fmt
+    rm -rf third_party/kineto/libkineto/third_party/googletest && cp -r third_party/googletest third_party/kineto/libkineto/third_party/googletest
 }
 
 build() {
@@ -206,5 +218,6 @@ df9732d99c5190a234edb76afb1b8d61f8c38ebd5806e88e881b639e9547450435cd4516d9e15155
 d50841e84645ae4e3d43e78496e433719d26d2cd5e192d36c7e08d2825167771743b5b5ae059b41f3e585892db9d66425d1f50fa93cf9e694773a080f66b6774  nlohmann-9cca280a4d0ccf0c08f47a99aa71d1b0e52f8d03.tar.gz
 c8327a67929eded217041b55506a58f5bf30e2f9ea3685c533112b9868ce15ee7615775ffd5b97daac873cf3abc97eb285de1f062b0e9f5007536d38317480fe  dynolog-d2ffe0a4e3acace628db49974246b66fc3e85fb1.tar.gz
 ddcca9f6d79f79821d6b60f9d3d5fdaadb651a611c853789e42185e32e5c9898cce3c632e4d441de9411e5cd6a0e48d9bde67cc8f3806642dee45b9964da318a  fmt-40626af88bd7df9a5fb80be7b25ac85b122d6c21.tar.gz
+e5c9525f40dea4cfc01e2904ee3dc26be891c47b62f99545d76f3dd779054c72e8a1fc8a8e57b19ba81aa99d9765b3b98c6b19348487d98edb708f7963766ccd  mimalloc-048d969a1c5ee2fb89c226298f41ea38445546ef.tar.gz
 f97762ba41b9cfef648e93932fd789324c6bb6ebc5b7aeca8185c9ef602294b67d73aea7ae371035579a1419cbfbeba7c3e88b31b5a5848db98f5e8a03b982b1  flatbuffers-24.12.23.tar.gz
 "
