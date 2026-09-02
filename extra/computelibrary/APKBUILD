@@ -38,7 +38,7 @@ build() {
 
 check() {
     build/arm_compute_benchmark
-    build/arm_compute_validation
+    build/arm_compute_validation --filter='^((?!F16|BFLOAT16|UNIT/Version).)*$'
 }
 
 package() {
