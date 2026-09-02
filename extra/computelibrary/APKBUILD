@@ -25,9 +25,9 @@ build() {
     cmake -B build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/usr \
-        -DCMAKE_INSTALL_LIBDIR=usr/lib \
-        -DCMAKE_INSTALL_BINDIR=usr/bin \
-        -DCMAKE_INSTALL_INCLUDEDIR=usr/include \
+        -DCMAKE_INSTALL_LIBDIR=lib \
+        -DCMAKE_INSTALL_BINDIR=bin \
+        -DCMAKE_INSTALL_INCLUDEDIR=include \
         -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS" \
         -DCMAKE_SHARED_LINKER_FLAGS="$LDFLAGS" \
         -DARM_COMPUTE_ENABLE_OPENMP=OFF \
