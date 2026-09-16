@@ -59,6 +59,8 @@ package() {
 
 tests() {
     pkgdesc="Tests and benchmarks for ComputeLibrary"
+    depends="$pkgname=$pkgver-r$pkgrel"
+
     mkdir -p "$subpkgdir"/usr
     mv "$pkgdir"/usr/bin "$subpkgdir"/usr/
 }
