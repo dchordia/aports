@@ -11,7 +11,6 @@ depends_dev="libc++-dev"
 makedepends="$depends_dev cmake ninja"
 subpackages="$pkgname-dev"
 source="$pkgname-$pkgver.tar.gz::https://github.com/zeux/$pkgname/archive/refs/tags/v$pkgver.tar.gz"
-options="!check" # With no tests found, Alpine returns with non zero check exit.
 
 build() {
     cmake -B build -G Ninja \
@@ -29,6 +28,7 @@ check() {
     # 970 pass and 7 fail (due to floating point precision errors on QNX)
     # Given the test bundling is as a single monolithic suite, there is no way to omit failing
     # Hence excluding the test suite
+    export CTEST_NO_TESTS_ACTION=ignore
     _test_exclude="pugixml::test"
     ctest --test-dir build -E $_test_exclude
 }
