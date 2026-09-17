@@ -36,7 +36,7 @@ depends_dev="
     zlib-dev
     flatbuffers-dev
     onetbb-dev
-    onnx
+    onnx-dev
     python3-dev
 "
 if [ "$CARCH" = "aarch64" ]; then
@@ -148,7 +148,7 @@ package() {
     rm -rf "$pkgdir"/usr/samples
     rm -f "$pkgdir"/usr/setupvars.sh
 
-    /usr/bin/python3.14 -m pip install \
+    python3 -m pip install \
         --prefix=/usr \
         --root="$pkgdir" \
         --no-deps \
@@ -166,6 +166,7 @@ python3_openvino() {
 tools() {
     pkgdesc="OpenVINO benchmarking and conversion tools"
     depends="$pkgname"
+
     mkdir -p "$subpkgdir"/usr
     mv "$pkgdir"/usr/bin "$subpkgdir"/usr/
 }
