@@ -16,7 +16,7 @@ makedepends="
 "
 subpackages="$pkgname-dev $pkgname-tests"
 source="
-    $_pkgname-$pkgver.tar.gz::https://github.com/ARM-software/ComputeLibrary/archive/refs/tags/v$pkgver.tar.gz
+    ComputeLibrary-$pkgver.tar.gz::https://github.com/ARM-software/ComputeLibrary/archive/refs/tags/v$pkgver.tar.gz
 "
 builddir="$srcdir/$_pkgname-$pkgver"
 
