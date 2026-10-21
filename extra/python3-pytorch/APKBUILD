@@ -74,7 +74,7 @@ subpackages="
     "
 options="!check"
 source="
-    $pkgname-$pkgver.tar.gz::https://github.com/qnx-ports/pytorch/archive/refs/heads/qnx-v2.12.1.tar.gz
+    $pkgname-$pkgver.tar.gz::https://github.com/qnx-ports/pytorch/archive/refs/tags/qnx-v$pkgver-r$pkgrel.tar.gz
     FP16-$_FP16_commit.tar.gz::https://github.com/Maratyszcza/FP16/archive/$_FP16_commit.tar.gz
     FXdiv-$_FXdiv_commit.tar.gz::https://github.com/Maratyszcza/FXdiv/archive/$_FXdiv_commit.tar.gz
     NVTX-$_NVTX_commit.tar.gz::https://github.com/NVIDIA/NVTX/archive/$_NVTX_commit.tar.gz
@@ -97,7 +97,7 @@ source="
     kleidiai-$_kleidiai_commit.tar.gz::https://github.com/ARM-software/kleidiai/archive/$_kleidiai_commit.tar.gz
     flatbuffers-$_flatbuffers_version.tar.gz::https://github.com/google/flatbuffers/archive/v$_flatbuffers_version.tar.gz
 "
-builddir="$srcdir/$_pkgname-qnx-v$pkgver"
+builddir="$srcdir/$_pkgname-qnx-v$pkgver-r$pkgrel"
 
 prepare() {
     default_prepare
@@ -194,7 +194,7 @@ package() {
 }
 
 sha512sums="
-09a64de110267d24b2e77e32b028dc4caa61de0b4b73ac7eb0d317bc6c9b0d2aff029b7af0e04c1c386cf8badcd1e1863d1129d66200b433854bb5eafad04748  python3-pytorch-2.12.1.tar.gz
+4f4d3ff8ef698d3f34d7bb64cf823721deee980d418cb9166fd62ce47e99bcd8ad4ccfc66c3b4d422212c756feadc6706766bce2517669241d7823ab6ff5643b  python3-pytorch-2.12.1.tar.gz
 e79a1f6f8d4aeca85982158d5b070923d31d4f2062ed84cfa6f26c47a34f2e8ac49e0f330b7d49f5732d5e1eec6e7afccdac43645070060fb7827e2ce261dd3e  FP16-4dfe081cf6bcd15db339cf2680b9281b8451eeb3.tar.gz
 d46d7c1437eccf8dc5ab5e51b0641d190839451ab059c8a24a220a9cf05a84a66b5d08c3ff730622efe491152a8378a2c726fd9abad19a3df98db40d6a13e4b9  FXdiv-b408327ac2a15ec3e43352421954f5b1967701d1.tar.gz
 17018c13c46382c65c44bb15a997817b88ae0d8f8dd32e6cf9f42c98fa074fb59509b4076c9f238883599a788ca24dc5c00f76ba59c2af7f99c3413aeb714279  NVTX-3ebbc93ded7285963bff932c678fa367eb393ba6.tar.gz
