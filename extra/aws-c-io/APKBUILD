@@ -3,6 +3,7 @@
 # Maintainer: Deep Chordia <dchordia@blackberry.com>
 pkgname=aws-c-io
 pkgver=0.26.1
+_commit=fd881c1f7d14c3593065c71d4d4bc5f1a22e0cc1
 pkgrel=1
 pkgdesc="Module for the AWS SDK for C handling all IO and TLS work for application protocols"
 url="https://github.com/awslabs/aws-c-io"
@@ -29,8 +30,8 @@ makedepends="
   ninja
   "
 subpackages="$pkgname-dev"
-source="$pkgname-$pkgver.tar.gz::https://github.com/qnx-ports/aws-c-io/archive/refs/heads/qnx-v$pkgver.tar.gz"
-builddir="$srcdir/$pkgname-qnx-v$pkgver"
+source="$pkgname-$pkgver.tar.gz::https://github.com/qnx-ports/aws-c-io/archive/$_commit.tar.gz"
+builddir="$srcdir/$pkgname-$_commit"
 
 build() {
   cmake -B build -G Ninja \
@@ -76,5 +77,5 @@ package() {
 }
 
 sha512sums="
-6b57aab51fc233fd47bdd1eab0a9444f9c9e62b1c460855a08fa601c8e2bc2a484edd48c42ce7b825a2340c0cfc66667416508d97ee46e0e2c41dec29059711f  aws-c-io-0.26.1.tar.gz
+e046c43b5bcc1063737ad55aa21e6a4ae24d160b481247fc22c680f34614c332f1b449448aa020e5703c06c0ed3d84ab443f340b015750aeee3221f3e3a5d655  aws-c-io-0.26.1.tar.gz
 "
